@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="ru" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#0a0a0a" />
+  <meta name="color-scheme" content="dark light" />
+  <title>Калькулятор калыма 🐑</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script>
+    (function () {
+      var tw = window.Telegram && window.Telegram.WebApp;
+      if (!tw) return;
+      tw.ready();
+      tw.expand();
+      try { tw.enableClosingConfirmation(); } catch (e) {}
+      try { if (typeof tw.disableVerticalSwipes === "function") tw.disableVerticalSwipes(); } catch (e) {}
+    })();
+  </script>
+  <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+  <script>
+    tailwind.config = { darkMode: "class" };
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Unbounded:wght@700;800;900&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+  <style>
+    :root {
+      --bg: #fff7ed;
+      --ink: #0a0a0a;
+      --card: #ffffff;
+      --neon: #a3e635;
+      --pink: #e879f9;
+      --cyan: #22d3ee;
+    }
+    .dark {
+      --bg: #09090b;
+      --ink: #fafafa;
+      --card: #18181b;
+      --neon: #bef264;
+      --pink: #f0abfc;
+      --cyan: #67e8f9;
+    }
+    html, body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "Manrope", system-ui, sans-serif;
+      min-height: 100%;
+      min-height: var(--tg-viewport-stable-height, 100dvh);
+    }
+    h1, h2, h3, .display {
+      font-family: "Unbounded", "Manrope", sans-serif;
+    }
+    body {
+      padding-top: calc(env(safe-area-inset-top, 0px) + var(--tg-content-safe-area-inset-top, 0px));
+      padding-bottom: calc(88px + env(safe-area-inset-bottom, 0px) + var(--tg-content-safe-area-inset-bottom, 0px));
+    }
+    .brutal {
+      border: 2px solid #000;
+      box-shadow: 4px 4px 0 0 #000;
+    }
+    .dark .brutal {
+      border-color: #fff;
+      box-shadow: 4px 4px 0 0 #fff;
+    }
+    .brutal-press:active {
+      transform: translate(2px, 2px);
+      box-shadow: 2px 2px 0 0 #000;
+    }
+    .dark .brutal-press:active {
+      box-shadow: 2px 2px 0 0 #fff;
+    }
+    @keyframes sheep-bounce {
+      0%, 100% { transform: translateY(0) rotate(-8deg); }
+      50% { transform: translateY(-7px) rotate(8deg); }
+    }
+    .sheep-bounce { animation: sheep-bounce 1.6s ease-in-out infinite; }
+    @keyframes neon-pulse {
+      0%, 100% { filter: drop-shadow(0 0 0 rgba(163, 230, 53, 0)); }
+      50% { filter: drop-shadow(0 0 10px rgba(163, 230, 53, 0.85)); }
+    }
+    .neon-pulse { animation: neon-pulse 2.2s ease-in-out infinite; }
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 10px;
+      border-radius: 999px;
+      background: #e4e4e7;
+      border: 2px solid #000;
+    }
+    .dark input[type="range"] { background: #3f3f46; border-color: #fff; }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 28px;
+      height: 28px;
+      border-radius: 999px;
+      background: #a3e635;
+      border: 2px solid #000;
+      box-shadow: 3px 3px 0 #000;
+      cursor: pointer;
+    }
+    .dark input[type="range"]::-webkit-slider-thumb {
+      border-color: #fff;
+      box-shadow: 3px 3px 0 #fff;
+    }
+    .option-card:has(input:checked) {
+      background: #d9f99d;
+      outline: 3px solid #000;
+    }
+    .dark .option-card:has(input:checked) {
+      background: #3f6212;
+      outline-color: #fff;
+    }
+    .chk:has(input:checked) {
+      background: #f0abfc;
+      color: #000;
+    }
+    .dark .chk:has(input:checked) {
+      background: #a21caf;
+      color: #fff;
+    }
+    .export-stage {
+      position: fixed;
+      left: -12000px;
+      top: 0;
+      pointer-events: none;
+    }
+    .stamp {
+      transform: rotate(-14deg);
+    }
+    .hidden-screen { display: none; }
+    #toast {
+      transform: translateX(-50%) translateY(20px);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.25s ease;
+    }
+    #toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+    select {
+      background-image: none;
+    }
+  </style>
+</head>
+<body class="bg-orange-50 text-zinc-950 dark:bg-zinc-950 dark:text-zinc-50">
+  <header class="sticky top-0 z-30 border-b-2 border-black bg-lime-300/95 dark:border-white dark:bg-lime-400 text-black">
+    <div class="mx-auto flex max-w-lg items-center justify-between gap-3 px-4 py-3">
+      <div class="flex items-center gap-2 min-w-0">
+        <span class="sheep-bounce neon-pulse text-3xl leading-none" aria-hidden="true">🐑</span>
+        <div class="min-w-0">
+          <p class="display text-[11px] font-black uppercase tracking-wider leading-none">Official Kalym Bureau</p>
+          <h1 class="display truncate text-base font-black leading-tight">Калькулятор калыма</h1>
+        </div>
+      </div>
+      <div class="flex shrink-0 gap-2">
+        <button id="soundBtn" type="button" class="brutal brutal-press h-11 w-11 bg-white dark:bg-zinc-900 dark:text-white" aria-label="Звук" title="Звук">🔊</button>
+        <button id="themeBtn" type="button" class="brutal brutal-press h-11 w-11 bg-white dark:bg-zinc-900 dark:text-white" aria-label="Тема" title="Тема">🌙</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="mx-auto max-w-lg px-4 pt-5">
+    <section id="screen-form">
+      <div class="brutal mb-5 bg-fuchsia-300 px-4 py-4 text-black dark:bg-fuchsia-500 dark:text-black">
+        <p class="display text-lg font-black leading-snug">Сколько баранов дадут за девушку?</p>
+        <p class="mt-1 text-sm font-bold">Заполни анкету — Госкомитет по калыму вынесет вердикт. Без торга, без скидок, только наука и 🐑.</p>
+      </div>
+
+      <form id="kalymForm" class="space-y-4" autocomplete="off">
+        <fieldset class="brutal bg-white p-4 dark:bg-zinc-900">
+          <label for="girlName" class="display mb-2 block text-sm font-black">1. Имя девушки</label>
+          <input id="girlName" name="girlName" type="text" maxlength="48" placeholder="Как зовут невесту?"
+            class="w-full border-2 border-black bg-yellow-100 px-3 py-3 text-base font-extrabold outline-none placeholder:font-bold placeholder:text-zinc-500 dark:border-white dark:bg-zinc-800 dark:text-white" />
+        </fieldset>
+
+        <fieldset class="brutal bg-white p-4 dark:bg-zinc-900">
+          <div class="mb-2 flex items-end justify-between gap-2">
+            <label for="age" class="display text-sm font-black">2. Возраст</label>
+            <span id="ageMeta" class="text-right text-xs font-extrabold text-lime-700 dark:text-lime-300">24 · +15</span>
+          </div>
+          <input id="age" name="age" type="range" min="18" max="60" value="24" />
+          <p id="ageHint" class="mt-2 text-sm font-bold">18–25: молодой потенциал (+15)</p>
+        </fieldset>
+
+        <fieldset class="brutal bg-white p-4 dark:bg-zinc-900">
+          <label for="cook" class="display mb-2 block text-sm font-black">3. Кулинарные сверхспособности</label>
+          <select id="cook" name="cook"
+            class="w-full border-2 border-black bg-orange-200 px-3 py-3 text-sm font-extrabold outline-none dark:border-white dark:bg-orange-900 dark:text-white">
+            <option value="35" data-label="Шеф уровня Мишлен: борщ лечит любые травмы">Шеф уровня Мишлен: борщ лечит любые травмы (+35)</option>
+            <option value="15" data-label="Съедобно, скорую пока не вызывали" selected>Съедобно, скорую пока не вызывали (+15)</option>
+            <option value="0" data-label="Спец по открыванию контейнеров из доставки">Спец по открыванию контейнеров из доставки (+0)</option>
+            <option value="-25" data-label="Умею поджигать даже воду">Умею поджигать даже воду (−25)</option>
+          </select>
+        </fieldset>
+
+        <fieldset class="brutal bg-white p-4 dark:bg-zinc-900">
+          <legend class="display mb-3 text-sm font-black">4. Характер и настроение</legend>
+          <div class="grid gap-2" id="mood-group">
+            <label class="option-card brutal-press flex cursor-pointer items-start gap-2 border-2 border-black bg-zinc-50 p-3 dark:border-white dark:bg-zinc-800">
+              <input type="radio" name="mood" value="30" data-label="Спокойная, как удав на солнце" class="mt-1" />
+              <span class="text-sm font-extrabold">Спокойная, как удав на солнце <span class="text-lime-700 dark:text-lime-300">+30</span></span>
+            </label>
+            <label class="option-card brutal-press flex cursor-pointer items-start gap-2 border-2 border-black bg-zinc-50 p-3 dark:border-white dark:bg-zinc-800">
+              <input type="radio" name="mood" value="15" data-label="Милая, но глаз иногда дергается" checked class="mt-1" />
+              <span class="text-sm font-extrabold">Милая, но глаз иногда дергается <span class="text-lime-700 dark:text-lime-300">+15</span></span>
+            </label>
+            <label class="option-card brutal-press flex cursor-pointer items-start gap-2 border-2 border-black bg-zinc-50 p-3 dark:border-white dark:bg-zinc-800">
+              <input type="radio" name="mood" value="-15" data-label="«Ой, всё!» звучит 14 раз в день" class="mt-1" />
+              <span class="text-sm font-extrabold">«Ой, всё!» звучит 14 раз в день <span class="text-fuchsia-700 dark:text-fuchsia-300">−15</span></span>
+            </label>
+            <label class="option-card brutal-press flex cursor-pointer items-start gap-2 border-2 border-black bg-zinc-50 p-3 dark:border-white dark:bg-zinc-800">
+              <input type="radio" name="mood" value="-30" data-label="Слушает True Crime и знает, как спрятать тело" class="mt-1" />
+              <span class="text-sm font-extrabold">Слушает True Crime и знает, как спрятать тело <span class="text-fuchsia-700 dark:text-fuchsia-300">−30</span></span>
+            </label>
+          </div>
+        </fieldset>
+
+        <fieldset class="brutal bg-white p-4 dark:bg-zinc-900">
+          <legend class="display mb-3 text-sm font-black">5. Отношение к шопингу и маркетплейсам</legend>
+          <div class="grid gap-2">
+            <label class="option-card brutal-press flex cursor-pointer items-start gap-2 border-2 border-black bg-zinc-50 p-3 dark:border-white dark:bg-zinc-800">
+              <input type="radio" name="shop" value="40" data-label="Удалила Wildberries и Ozon ради экономии" class="mt-1" />
+              <span class="text-sm font-extrabold">Удалила Wildberries и Ozon ради экономии <span class="text-lime-700 dark:text-lime-300">+40</span></span>
+            </label>
+            <label class="option-card brutal-press flex cursor-pointer items-start gap-2 border-2 border-black bg-zinc-50 p-3 dark:border-white dark:bg-zinc-800">
+              <input type="radio" name="shop" value="15" data-label="Покупает только нужные вещи по скидкам" checked class="mt-1" />
+              <span class="text-sm font-extrabold">Покупает только нужные вещи по скидкам <span class="text-lime-700 dark:text-lime-300">+15</span></span>
+            </label>
+            <label class="option-card brutal-press flex cursor-pointer items-start gap-2 border-2 border-black bg-zinc-50 p-3 dark:border-white dark:bg-zinc-800">
+              <input type="radio" name="shop" value="-20" data-label="Курьеры здороваются за руку и знают кота по имени" class="mt-1" />
+              <span class="text-sm font-extrabold">Курьеры здороваются за руку и знают кота по имени <span class="text-fuchsia-700 dark:text-fuchsia-300">−20</span></span>
+            </label>
+            <label class="option-card brutal-press flex cursor-pointer items-start gap-2 border-2 border-black bg-zinc-50 p-3 dark:border-white dark:bg-zinc-800">
+              <input type="radio" name="shop" value="-35" data-label="Пункты выдачи — её второй дом" class="mt-1" />
+              <span class="text-sm font-extrabold">Пункты выдачи — её второй дом <span class="text-fuchsia-700 dark:text-fuchsia-300">−35</span></span>
+            </label>
+          </div>
+        </fieldset>
+
+        <fieldset class="brutal bg-white p-4 dark:bg-zinc-900">
+          <legend class="display mb-3 text-sm font-black">6. Ориентация в пространстве и авто</legend>
+          <div class="grid gap-2">
+            <label class="option-card brutal-press flex cursor-pointer items-start gap-2 border-2 border-black bg-zinc-50 p-3 dark:border-white dark:bg-zinc-800">
+              <input type="radio" name="drive" value="30" data-label="Паркуется задом с закрытыми глазами по зеркалам" class="mt-1" />
+              <span class="text-sm font-extrabold">Паркуется задом с закрытыми глазами по зеркалам <span class="text-lime-700 dark:text-lime-300">+30</span></span>
+            </label>
+            <label class="option-card brutal-press flex cursor-pointer items-start gap-2 border-2 border-black bg-zinc-50 p-3 dark:border-white dark:bg-zinc-800">
+              <input type="radio" name="drive" value="10" data-label="Ездит уверенно, путает только лево и право" checked class="mt-1" />
+              <span class="text-sm font-extrabold">Ездит уверенно, путает только лево и право <span class="text-lime-700 dark:text-lime-300">+10</span></span>
+            </label>
+            <label class="option-card brutal-press flex cursor-pointer items-start gap-2 border-2 border-black bg-zinc-50 p-3 dark:border-white dark:bg-zinc-800">
+              <input type="radio" name="drive" value="-15" data-label="«Поверните направо через 100 метров» вызывает панику" class="mt-1" />
+              <span class="text-sm font-extrabold">«Поверните направо через 100 метров» вызывает панику <span class="text-fuchsia-700 dark:text-fuchsia-300">−15</span></span>
+            </label>
+            <label class="option-card brutal-press flex cursor-pointer items-start gap-2 border-2 border-black bg-zinc-50 p-3 dark:border-white dark:bg-zinc-800">
+              <input type="radio" name="drive" value="0" data-label="Пешеход с пожизненным абонементом на такси" class="mt-1" />
+              <span class="text-sm font-extrabold">Пешеход с пожизненным абонементом на такси <span class="text-zinc-600 dark:text-zinc-300">+0</span></span>
+            </label>
+          </div>
+        </fieldset>
+
+        <fieldset class="brutal bg-white p-4 dark:bg-zinc-900">
+          <legend class="display mb-3 text-sm font-black">7. Сборы и пунктуальность</legend>
+          <div class="grid gap-2">
+            <label class="option-card brutal-press flex cursor-pointer items-start gap-2 border-2 border-black bg-zinc-50 p-3 dark:border-white dark:bg-zinc-800">
+              <input type="radio" name="time" value="35" data-label="Готова за 15 минут, включая макияж" class="mt-1" />
+              <span class="text-sm font-extrabold">Готова за 15 минут, включая макияж <span class="text-lime-700 dark:text-lime-300">+35</span></span>
+            </label>
+            <label class="option-card brutal-press flex cursor-pointer items-start gap-2 border-2 border-black bg-zinc-50 p-3 dark:border-white dark:bg-zinc-800">
+              <input type="radio" name="time" value="-15" data-label="«Выхожу через 5 минут» (на самом деле моет голову)" checked class="mt-1" />
+              <span class="text-sm font-extrabold">«Выхожу через 5 минут» (на самом деле моет голову) <span class="text-fuchsia-700 dark:text-fuchsia-300">−15</span></span>
+            </label>
+            <label class="option-card brutal-press flex cursor-pointer items-start gap-2 border-2 border-black bg-zinc-50 p-3 dark:border-white dark:bg-zinc-800">
+              <input type="radio" name="time" value="-30" data-label="Собирается 3 часа, чтобы в итоге никуда не пойти" class="mt-1" />
+              <span class="text-sm font-extrabold">Собирается 3 часа, чтобы в итоге никуда не пойти <span class="text-fuchsia-700 dark:text-fuchsia-300">−30</span></span>
+            </label>
+          </div>
+        </fieldset>
+
+        <fieldset class="brutal bg-white p-4 dark:bg-zinc-900">
+          <legend class="display mb-3 text-sm font-black">8. Мемная эрудиция</legend>
+          <div class="grid gap-2">
+            <label class="option-card brutal-press flex cursor-pointer items-start gap-2 border-2 border-black bg-zinc-50 p-3 dark:border-white dark:bg-zinc-800">
+              <input type="radio" name="meme" value="25" data-label="Отвечает стикерами в тему и цитирует постиронию" class="mt-1" />
+              <span class="text-sm font-extrabold">Отвечает стикерами в тему и цитирует постиронию <span class="text-lime-700 dark:text-lime-300">+25</span></span>
+            </label>
+            <label class="option-card brutal-press flex cursor-pointer items-start gap-2 border-2 border-black bg-zinc-50 p-3 dark:border-white dark:bg-zinc-800">
+              <input type="radio" name="meme" value="10" data-label="Понимает базовые мемы с котами" checked class="mt-1" />
+              <span class="text-sm font-extrabold">Понимает базовые мемы с котами <span class="text-lime-700 dark:text-lime-300">+10</span></span>
+            </label>
+            <label class="option-card brutal-press flex cursor-pointer items-start gap-2 border-2 border-black bg-zinc-50 p-3 dark:border-white dark:bg-zinc-800">
+              <input type="radio" name="meme" value="-20" data-label="Присылает открытки «С добрым утром» в WhatsApp" class="mt-1" />
+              <span class="text-sm font-extrabold">Присылает открытки «С добрым утром» в WhatsApp <span class="text-fuchsia-700 dark:text-fuchsia-300">−20</span></span>
+            </label>
+          </div>
+        </fieldset>
+
+        <fieldset class="brutal bg-white p-4 dark:bg-zinc-900">
+          <legend class="display mb-3 text-sm font-black">9. Секретные бонусы</legend>
+          <div class="grid gap-2">
+            <label class="chk brutal-press flex cursor-pointer items-start gap-2 border-2 border-black bg-zinc-50 p-3 dark:border-white dark:bg-zinc-800">
+              <input type="checkbox" name="bonus" value="20" data-label="Знает, чем офсайд отличается от аута" class="mt-1 h-4 w-4" />
+              <span class="text-sm font-extrabold">Знает, чем офсайд отличается от аута <span class="text-lime-700 dark:text-lime-200">+20</span></span>
+            </label>
+            <label class="chk brutal-press flex cursor-pointer items-start gap-2 border-2 border-black bg-zinc-50 p-3 dark:border-white dark:bg-zinc-800">
+              <input type="checkbox" name="bonus" value="25" data-label="Не заставляет фотографировать её по 40 минут на закате" class="mt-1 h-4 w-4" />
+              <span class="text-sm font-extrabold">Не заставляет фотографировать её по 40 минут на закате <span class="text-lime-700 dark:text-lime-200">+25</span></span>
+            </label>
+            <label class="chk brutal-press flex cursor-pointer items-start gap-2 border-2 border-black bg-zinc-50 p-3 dark:border-white dark:bg-zinc-800">
+              <input type="checkbox" name="bonus" value="30" data-label="Не спрашивает: «А кто эта шмара, лайкнувшая пост 2017 года?»" class="mt-1 h-4 w-4" />
+              <span class="text-sm font-extrabold">Не спрашивает: «А кто эта шмара, лайкнувшая пост 2017 года?» <span class="text-lime-700 dark:text-lime-200">+30</span></span>
+            </label>
+            <label class="chk brutal-press flex cursor-pointer items-start gap-2 border-2 border-black bg-zinc-50 p-3 dark:border-white dark:bg-zinc-800">
+              <input type="checkbox" name="bonus" value="-15" data-label="Забирает картошку фри со словами «Я только попробовать»" class="mt-1 h-4 w-4" />
+              <span class="text-sm font-extrabold">Забирает картошку фри со словами «Я только попробовать» <span class="text-fuchsia-700 dark:text-fuchsia-200">−15</span></span>
+            </label>
+            <label class="chk brutal-press flex cursor-pointer items-start gap-2 border-2 border-black bg-zinc-50 p-3 dark:border-white dark:bg-zinc-800">
+              <input type="checkbox" name="bonus" value="-20" data-label="Верит в ретроградный Меркурий и карту таро" class="mt-1 h-4 w-4" />
+              <span class="text-sm font-extrabold">Верит в ретроградный Меркурий и карту таро <span class="text-fuchsia-700 dark:text-fuchsia-200">−20</span></span>
+            </label>
+            <label class="chk brutal-press flex cursor-pointer items-start gap-2 border-2 border-black bg-zinc-50 p-3 dark:border-white dark:bg-zinc-800">
+              <input type="checkbox" name="bonus" value="-10" data-label="Забывает пароли от всех аккаунтов раз в неделю" class="mt-1 h-4 w-4" />
+              <span class="text-sm font-extrabold">Забывает пароли от всех аккаунтов раз в неделю <span class="text-fuchsia-700 dark:text-fuchsia-200">−10</span></span>
+            </label>
+            <label class="chk brutal-press flex cursor-pointer items-start gap-2 border-2 border-black bg-zinc-50 p-3 dark:border-white dark:bg-zinc-800">
+              <input type="checkbox" name="bonus" value="15" data-label="Любит чипсы с крабом и посиделки в гараже" class="mt-1 h-4 w-4" />
+              <span class="text-sm font-extrabold">Любит чипсы с крабом и посиделки в гараже <span class="text-lime-700 dark:text-lime-200">+15</span></span>
+            </label>
+          </div>
+        </fieldset>
+
+        <div class="brutal bg-cyan-300 px-4 py-3 text-black dark:bg-cyan-400">
+          <p class="text-xs font-black uppercase tracking-wide">Черновая оценка Госкомитета</p>
+          <p id="liveScore" class="display text-2xl font-black">~50 🐑</p>
+        </div>
+
+        <button id="calcBtn" type="submit" class="brutal brutal-press w-full bg-lime-400 py-4 text-lg font-black text-black dark:bg-lime-400">
+          РАССЧИТАТЬ ВЫКУП 🐑
+        </button>
+      </form>
+    </section>
+
+    <section id="screen-result" class="hidden-screen space-y-4">
+      <div class="brutal bg-yellow-300 p-5 text-black dark:bg-yellow-400">
+        <p class="text-xs font-black uppercase tracking-widest">Итоговый калым</p>
+        <p id="resultName" class="display mt-1 text-xl font-black"></p>
+        <p class="mt-3 flex items-end gap-2">
+          <span id="resultCount" class="display text-7xl font-black leading-none">0</span>
+          <span class="display pb-2 text-2xl font-black">🐑</span>
+        </p>
+        <p id="resultVerdict" class="mt-3 text-base font-extrabold leading-snug"></p>
+      </div>
+
+      <div id="breakdown" class="brutal bg-white p-4 dark:bg-zinc-900"></div>
+
+      <div class="grid gap-3">
+        <button id="storiesBtn" type="button" class="brutal brutal-press w-full bg-fuchsia-400 py-3 text-sm font-black text-black">📱 Скачать Stories (9:16 PNG)</button>
+        <button id="certPngBtn" type="button" class="brutal brutal-press w-full bg-cyan-300 py-3 text-sm font-black text-black">📜 Скачать сертификат (PNG)</button>
+        <button id="certPdfBtn" type="button" class="brutal brutal-press w-full bg-orange-300 py-3 text-sm font-black text-black">📄 Скачать в PDF</button>
+        <button id="shareBtn" type="button" class="brutal brutal-press w-full bg-lime-400 py-3 text-sm font-black text-black">Поделиться в Telegram 📤</button>
+        <button id="againBtn" type="button" class="brutal brutal-press w-full bg-white py-3 text-sm font-black text-black dark:bg-zinc-900 dark:text-white">Пересчитать калым</button>
+      </div>
+    </section>
+
+    <aside id="adBanner" class="brutal mt-8 bg-yellow-300 p-4 text-black dark:bg-yellow-400">
+      <p class="display text-base font-black">📢 Место для вашей рекламы</p>
+      <p class="mt-2 text-sm font-extrabold leading-snug">
+        Хочешь тут разместить свою рекламу? Пиши на email:
+        <a id="adMail" href="mailto:irabotaros@gmail.com?subject=%D0%A0%D0%B5%D0%BA%D0%BB%D0%B0%D0%BC%D0%B0%20%D0%B2%20calc_bee"
+          class="underline decoration-2 underline-offset-2">irabotaros@gmail.com</a>
+      </p>
+      <p class="mt-1 text-xs font-bold">Тема письма: Реклама в calc_bee</p>
+    </aside>
+
+    <footer class="mt-5 border-t-2 border-black pb-4 pt-4 text-center text-[11px] font-bold leading-relaxed text-zinc-600 dark:border-white dark:text-zinc-400">
+      Сервис носит исключительно юмористический характер. Ни одно животное и ни одна девушка не пострадали при калибровке алгоритмов.
+    </footer>
+  </main>
+
+  <div id="toast" class="fixed bottom-6 left-1/2 z-50 max-w-[90%] brutal bg-black px-4 py-2 text-sm font-black text-lime-300 dark:bg-white dark:text-black"></div>
+
+  <div id="previewModal" class="fixed inset-0 z-40 hidden items-center justify-center bg-black/70 p-4">
+    <div class="brutal max-h-[90vh] w-full max-w-sm overflow-auto bg-white p-3 dark:bg-zinc-900">
+      <p class="display mb-2 text-sm font-black">Превью · зажми, чтобы сохранить</p>
+      <img id="previewImg" alt="Превью экспорта" class="w-full border-2 border-black dark:border-white" />
+      <button id="closePreview" type="button" class="brutal brutal-press mt-3 w-full bg-lime-400 py-2 text-sm font-black text-black">Закрыть</button>
+    </div>
+  </div>
+
+  <div class="export-stage" aria-hidden="true">
+    <div id="storiesCard" style="width:360px;height:640px;background:linear-gradient(160deg,#f0abfc 0%,#a3e635 42%,#22d3ee 100%);padding:18px;box-sizing:border-box;font-family:'Unbounded','Manrope',sans-serif;color:#0a0a0a;position:relative;overflow:hidden;">
+      <div style="position:absolute;inset:0;opacity:.18;font-size:42px;line-height:1.4;word-break:break-all;padding:8px;">🐑🐑🐑🐑🐑🐑🐑🐑🐑🐑🐑🐑🐑🐑🐑🐑</div>
+      <div style="position:relative;height:100%;border:4px solid #000;box-shadow:8px 8px 0 #000;background:#09090b;color:#fafafa;padding:18px;box-sizing:border-box;display:flex;flex-direction:column;">
+        <div style="border:3px solid #a3e635;background:#a3e635;color:#000;padding:8px 10px;font-weight:900;font-size:13px;letter-spacing:.04em;text-align:center;line-height:1.25;">ОФИЦИАЛЬНЫЙ КАЛЫМ-РЕЙТИНГ 🐑</div>
+        <p id="stName" style="margin:22px 0 0;font-size:26px;font-weight:900;line-height:1.15;word-break:break-word;"></p>
+        <p style="margin:18px 0 0;font-size:13px;font-weight:800;color:#bef264;letter-spacing:.08em;">БАРАНОВ К ВЫКУПУ</p>
+        <p id="stCount" style="margin:4px 0 0;font-size:96px;font-weight:900;line-height:.9;color:#a3e635;">0</p>
+        <p id="stVerdict" style="margin:16px 0 0;font-size:16px;font-weight:800;line-height:1.3;color:#f0abfc;"></p>
+        <div id="stPerks" style="margin-top:16px;display:flex;flex-direction:column;gap:8px;"></div>
+        <div class="stamp" style="position:absolute;right:16px;bottom:72px;width:132px;height:132px;border:6px solid #ef4444;border-radius:999px;color:#ef4444;display:flex;align-items:center;justify-content:center;text-align:center;font-size:13px;font-weight:900;line-height:1.2;background:rgba(0,0,0,.35);">ПРОВЕРЕНО<br/>100% ВЫКУП</div>
+        <p style="margin-top:auto;font-size:10px;font-weight:700;color:#a1a1aa;">Kalym Bureau · юмор · 0 животных не пострадало</p>
+      </div>
+    </div>
+
+    <div id="certCard" style="width:1123px;height:794px;background:#fff8e7;padding:28px;box-sizing:border-box;font-family:'Manrope',serif;color:#1c1917;">
+      <div style="height:100%;border:8px double #111;padding:28px;box-sizing:border-box;position:relative;background:repeating-linear-gradient(0deg,rgba(0,0,0,.015) 0 2px,transparent 2px 8px),#fffdf6;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:24px;">
+          <div style="width:92px;height:92px;border:4px solid #111;border-radius:999px;display:flex;align-items:center;justify-content:center;font-size:46px;background:#fde047;box-shadow:6px 6px 0 #111;">🐑</div>
+          <div style="flex:1;text-align:center;">
+            <p style="margin:0;font-family:'Unbounded',sans-serif;font-size:13px;font-weight:900;letter-spacing:.18em;text-transform:uppercase;">Государственный комитет по оценке калыма</p>
+            <h2 style="margin:8px 0 0;font-family:'Unbounded',sans-serif;font-size:34px;font-weight:900;">СЕРТИФИКАТ ВЫКУПА</h2>
+            <p id="certSerial" style="margin:8px 0 0;font-weight:800;font-size:16px;">№ БАРАН-9921-VIP</p>
+          </div>
+          <div style="width:92px;height:92px;border:4px solid #111;display:flex;align-items:center;justify-content:center;text-align:center;font-family:'Unbounded',sans-serif;font-size:11px;font-weight:900;line-height:1.2;background:#a3e635;box-shadow:6px 6px 0 #111;">ПРИКАЗ<br/>ГКОК<br/>24/7</div>
+        </div>
+        <p style="margin:28px 0 0;text-align:center;font-size:18px;font-weight:700;">Настоящим подтверждается, что по итогам независимой экспертизы</p>
+        <p id="certName" style="margin:12px 0 0;text-align:center;font-family:'Unbounded',sans-serif;font-size:40px;font-weight:900;"></p>
+        <p style="margin:10px 0 0;text-align:center;font-size:20px;font-weight:800;">признана достойной официального калыма в размере</p>
+        <p id="certCount" style="margin:8px 0 0;text-align:center;font-family:'Unbounded',sans-serif;font-size:72px;font-weight:900;color:#365314;">0 🐑</p>
+        <p id="certVerdict" style="margin:8px auto 0;max-width:860px;text-align:center;font-size:22px;font-weight:800;"></p>
+        <div id="certPerks" style="margin:22px auto 0;max-width:900px;display:flex;gap:10px;flex-wrap:wrap;justify-content:center;"></div>
+        <div style="position:absolute;left:48px;bottom:36px;">
+          <p style="margin:0;font-size:13px;font-weight:700;">Дата выдачи: <span id="certDate"></span></p>
+          <p style="margin:4px 0 0;font-size:13px;font-weight:700;">Место: пастбище №7, цифровой аул</p>
+        </div>
+        <div style="position:absolute;right:220px;bottom:28px;text-align:center;">
+          <p style="margin:0;font-family:'Brush Script MT','Segoe Script',cursive;font-size:42px;transform:rotate(-8deg);">Чабанъ</p>
+          <p style="margin:0;font-size:12px;font-weight:800;letter-spacing:.12em;">ПОДПИСЬ ЧАБАНА</p>
+        </div>
+        <div class="stamp" style="position:absolute;right:40px;bottom:40px;width:150px;height:150px;border:7px solid #b91c1c;border-radius:999px;color:#b91c1c;display:flex;align-items:center;justify-content:center;text-align:center;font-family:'Unbounded',sans-serif;font-size:14px;font-weight:900;line-height:1.2;background:rgba(255,255,255,.55);">ПРОВЕРЕНО<br/>100% ВЫКУП</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      "use strict";
+
+      var tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+      var inTelegram = !!(tg && tg.initData);
+      var phase = "form";
+      var lastResult = null;
+      var themeManual = localStorage.getItem("kalym-theme");
+
+      var els = {
+        formScreen: document.getElementById("screen-form"),
+        resultScreen: document.getElementById("screen-result"),
+        form: document.getElementById("kalymForm"),
+        name: document.getElementById("girlName"),
+        age: document.getElementById("age"),
+        ageMeta: document.getElementById("ageMeta"),
+        ageHint: document.getElementById("ageHint"),
+        cook: document.getElementById("cook"),
+        liveScore: document.getElementById("liveScore"),
+        calcBtn: document.getElementById("calcBtn"),
+        resultName: document.getElementById("resultName"),
+        resultCount: document.getElementById("resultCount"),
+        resultVerdict: document.getElementById("resultVerdict"),
+        breakdown: document.getElementById("breakdown"),
+        soundBtn: document.getElementById("soundBtn"),
+        themeBtn: document.getElementById("themeBtn"),
+        storiesBtn: document.getElementById("storiesBtn"),
+        certPngBtn: document.getElementById("certPngBtn"),
+        certPdfBtn: document.getElementById("certPdfBtn"),
+        shareBtn: document.getElementById("shareBtn"),
+        againBtn: document.getElementById("againBtn"),
+        toast: document.getElementById("toast"),
+        previewModal: document.getElementById("previewModal"),
+        previewImg: document.getElementById("previewImg"),
+        closePreview: document.getElementById("closePreview"),
+        storiesCard: document.getElementById("storiesCard"),
+        certCard: document.getElementById("certCard"),
+        stName: document.getElementById("stName"),
+        stCount: document.getElementById("stCount"),
+        stVerdict: document.getElementById("stVerdict"),
+        stPerks: document.getElementById("stPerks"),
+        certName: document.getElementById("certName"),
+        certCount: document.getElementById("certCount"),
+        certVerdict: document.getElementById("certVerdict"),
+        certSerial: document.getElementById("certSerial"),
+        certDate: document.getElementById("certDate"),
+        certPerks: document.getElementById("certPerks")
+      };
+
+      var audio = {
+        ctx: null,
+        enabled: localStorage.getItem("kalym-sound") !== "off",
+        ensure: function () {
+          if (!this.enabled) return null;
+          var AC = window.AudioContext || window.webkitAudioContext;
+          if (!AC) return null;
+          if (!this.ctx) this.ctx = new AC();
+          if (this.ctx.state === "suspended") this.ctx.resume();
+          return this.ctx;
+        },
+        click: function () {
+          var ctx = this.ensure();
+          if (!ctx) return;
+          var t = ctx.currentTime;
+          var osc = ctx.createOscillator();
+          var g = ctx.createGain();
+          osc.type = "square";
+          osc.frequency.value = 740;
+          g.gain.setValueAtTime(0.07, t);
+          g.gain.exponentialRampToValueAtTime(0.0001, t + 0.045);
+          osc.connect(g);
+          g.connect(ctx.destination);
+          osc.start(t);
+          osc.stop(t + 0.05);
+        },
+        bleat: function (opts) {
+          var ctx = this.ensure();
+          if (!ctx) return;
+          opts = opts || {};
+          var t0 = ctx.currentTime + (opts.delay || 0);
+          var dur = opts.duration || 0.72;
+          var base = opts.pitch || 280;
+          var sad = !!opts.sad;
+          var vol = opts.vol || 0.16;
+
+          var nLen = Math.floor(ctx.sampleRate * 0.05);
+          var buf = ctx.createBuffer(1, nLen, ctx.sampleRate);
+          var data = buf.getChannelData(0);
+          for (var i = 0; i < nLen; i++) data[i] = (Math.random() * 2 - 1) * (1 - i / nLen);
+          var noise = ctx.createBufferSource();
+          noise.buffer = buf;
+          var ng = ctx.createGain();
+          ng.gain.setValueAtTime(0.28, t0);
+          ng.gain.exponentialRampToValueAtTime(0.001, t0 + 0.07);
+          var nf = ctx.createBiquadFilter();
+          nf.type = "bandpass";
+          nf.frequency.value = 380;
+          noise.connect(nf);
+          nf.connect(ng);
+          ng.connect(ctx.destination);
+          noise.start(t0);
+
+          var osc = ctx.createOscillator();
+          var osc2 = ctx.createOscillator();
+          osc.type = "sawtooth";
+          osc2.type = "triangle";
+          osc2.detune.value = 8;
+          var lfo = ctx.createOscillator();
+          lfo.frequency.value = sad ? 3.4 : 7.2;
+          var lfoGain = ctx.createGain();
+          lfoGain.gain.value = sad ? 10 : 24;
+          lfo.connect(lfoGain);
+          lfoGain.connect(osc.frequency);
+          lfoGain.connect(osc2.frequency);
+          osc.frequency.setValueAtTime(base, t0);
+          osc2.frequency.setValueAtTime(base * 0.5, t0);
+          if (sad) {
+            osc.frequency.exponentialRampToValueAtTime(Math.max(80, base * 0.68), t0 + dur);
+            osc2.frequency.exponentialRampToValueAtTime(Math.max(60, base * 0.34), t0 + dur);
+          } else {
+            osc.frequency.linearRampToValueAtTime(base * 1.08, t0 + dur * 0.4);
+            osc.frequency.linearRampToValueAtTime(base * 0.96, t0 + dur);
+          }
+          var filter = ctx.createBiquadFilter();
+          filter.type = "bandpass";
+          filter.Q.value = 4.2;
+          filter.frequency.setValueAtTime(base * 2.1, t0);
+          var gain = ctx.createGain();
+          gain.gain.setValueAtTime(0.0001, t0);
+          gain.gain.exponentialRampToValueAtTime(vol, t0 + 0.04);
+          gain.gain.setValueAtTime(vol * 0.9, t0 + dur * 0.55);
+          gain.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+          osc.connect(filter);
+          osc2.connect(filter);
+          filter.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(t0);
+          osc2.start(t0);
+          lfo.start(t0);
+          osc.stop(t0 + dur + 0.03);
+          osc2.stop(t0 + dur + 0.03);
+          lfo.stop(t0 + dur + 0.03);
+        },
+        tone: function (freq, start, dur, type, vol) {
+          var ctx = this.ensure();
+          if (!ctx) return;
+          var osc = ctx.createOscillator();
+          var g = ctx.createGain();
+          osc.type = type || "triangle";
+          osc.frequency.setValueAtTime(freq, start);
+          g.gain.setValueAtTime(0.0001, start);
+          g.gain.exponentialRampToValueAtTime(vol || 0.12, start + 0.02);
+          g.gain.exponentialRampToValueAtTime(0.0001, start + dur);
+          osc.connect(g);
+          g.connect(ctx.destination);
+          osc.start(start);
+          osc.stop(start + dur + 0.02);
+        },
+        fanfare: function () {
+          var ctx = this.ensure();
+          if (!ctx) return;
+          var t = ctx.currentTime;
+          var notes = [523.25, 659.25, 783.99, 1046.5];
+          for (var i = 0; i < notes.length; i++) {
+            this.tone(notes[i], t + i * 0.12, 0.28, "triangle", 0.14);
+            this.tone(notes[i] * 0.5, t + i * 0.12, 0.28, "square", 0.04);
+          }
+        },
+        fail: function () {
+          var ctx = this.ensure();
+          if (!ctx) return;
+          var t = ctx.currentTime;
+          this.tone(330, t, 0.22, "sawtooth", 0.1);
+          this.tone(247, t + 0.2, 0.35, "sawtooth", 0.1);
+          this.bleat({ pitch: 210, duration: 0.9, sad: true, delay: 0.05, vol: 0.14 });
+        },
+        onResult: function (rams) {
+          if (rams > 90) {
+            this.fanfare();
+            this.bleat({ pitch: 300, duration: 0.55, vol: 0.12 });
+            this.bleat({ pitch: 360, duration: 0.6, delay: 0.12, vol: 0.1 });
+            this.bleat({ pitch: 240, duration: 0.7, delay: 0.22, vol: 0.1 });
+          } else if (rams >= 40) {
+            this.bleat({ pitch: 280, duration: 0.75, vol: 0.16 });
+          } else {
+            this.fail();
+          }
+        }
+      };
+
+      function haptic(kind, arg) {
+        try {
+          if (!tg || !tg.HapticFeedback) return;
+          if (kind === "impact") tg.HapticFeedback.impactOccurred(arg || "light");
+          if (kind === "notify") tg.HapticFeedback.notificationOccurred(arg || "success");
+        } catch (e) {}
+      }
+
+      function toast(msg) {
+        els.toast.textContent = msg;
+        els.toast.classList.add("show");
+        clearTimeout(toast._t);
+        toast._t = setTimeout(function () { els.toast.classList.remove("show"); }, 2400);
+      }
+
+      function ageInfo(age) {
+        if (age <= 25) return { pts: 15, label: "Молодой потенциал", hint: "18–25: молодой потенциал (+15)" };
+        if (age <= 35) return { pts: 20, label: "Опыт и мудрость", hint: "26–35: опыт и мудрость (+20)" };
+        return { pts: 30, label: "Элитный винтаж", hint: "36+: элитный винтаж (+30)" };
+      }
+
+      function checkedRadio(name) {
+        return els.form.querySelector('input[name="' + name + '"]:checked');
+      }
+
+      function collect() {
+        var name = (els.name.value || "").trim() || "Безымянная";
+        var age = Number(els.age.value);
+        var a = ageInfo(age);
+        var cookOpt = els.cook.options[els.cook.selectedIndex];
+        var lines = [];
+        var perks = [];
+        var sum = 0;
+
+        function add(title, pts, label, perk) {
+          sum += pts;
+          lines.push({ title: title, pts: pts, label: label });
+          if (perk) perks.push(label);
+        }
+
+        add("Возраст " + age, a.pts, a.label, true);
+        add("Кухня", Number(cookOpt.value), cookOpt.getAttribute("data-label"), true);
+
+        ["mood", "shop", "drive", "time", "meme"].forEach(function (key) {
+          var el = checkedRadio(key);
+          if (!el) return;
+          add(key, Number(el.value), el.getAttribute("data-label"), true);
+        });
+
+        var titles = { mood: "Характер", shop: "Шопинг", drive: "Авто", time: "Сборы", meme: "Мемы" };
+        lines.forEach(function (row) {
+          if (titles[row.title]) row.title = titles[row.title];
+        });
+
+        els.form.querySelectorAll('input[name="bonus"]:checked').forEach(function (el) {
+          add("Бонус", Number(el.value), el.getAttribute("data-label"), true);
+        });
+
+        var raw = 50 + sum;
+        var rams = Math.max(-20, Math.min(250, raw));
+        return { name: name, age: age, lines: lines, perks: pickPerks(perks), raw: raw, rams: rams, verdict: verdictOf(rams) };
+      }
+
+      function pickPerks(list) {
+        var funny = list.filter(function (t) {
+          return t && !/потенциал|мудрость|винтаж|Съедобно|скидк|лево и право|котами/i.test(t);
+        });
+        var pool = (funny.length >= 2 ? funny : list).slice();
+        return pool.slice(-3);
+      }
+
+      function verdictOf(n) {
+        if (n < 0) return "Опасная сделка: отдайте 5 баранов и бегите";
+        if (n <= 40) return "Студенческий тариф: экономно, но с сюрпризами";
+        if (n <= 90) return "Надежный выбор: стандартный восточный комфорт";
+        if (n <= 150) return "Премиум-невеста: шейхи выстраиваются в очередь";
+        return "Легендарный дроп: султан заложил дворец и весь гарем";
+      }
+
+      function fmtPts(n) {
+        return (n > 0 ? "+" : "") + n;
+      }
+
+      function updateLive() {
+        var r = collect();
+        els.liveScore.textContent = "~" + r.rams + " 🐑";
+        var a = ageInfo(Number(els.age.value));
+        els.ageMeta.textContent = els.age.value + " · " + fmtPts(a.pts);
+        els.ageHint.textContent = a.hint;
+      }
+
+      function countUp(el, target, duration) {
+        var start = performance.now();
+        duration = duration || 1100;
+        function frame(now) {
+          var t = Math.min(1, (now - start) / duration);
+          var eased = 1 - Math.pow(1 - t, 3);
+          el.textContent = String(Math.round(target * eased));
+          if (t < 1) requestAnimationFrame(frame);
+        }
+        requestAnimationFrame(frame);
+      }
+
+      function fireConfetti() {
+        if (typeof confetti !== "function") return;
+        var colors = ["#A3E635", "#F0ABFC", "#67E8F9", "#FACC15", "#ffffff"];
+        confetti({ particleCount: 140, spread: 80, origin: { y: 0.62 }, colors: colors });
+        confetti({ particleCount: 70, angle: 60, spread: 55, origin: { x: 0 }, colors: colors });
+        confetti({ particleCount: 70, angle: 120, spread: 55, origin: { x: 1 }, colors: colors });
+        if (confetti.shapeFromText) {
+          try {
+            var sheep = confetti.shapeFromText({ text: "🐑", scalar: 2.4 });
+            confetti({ shapes: [sheep], particleCount: 18, spread: 70, origin: { y: 0.55 } });
+          } catch (e) {}
+        }
+      }
+
+      function applyTheme(scheme) {
+        var dark = scheme === "dark";
+        document.documentElement.classList.toggle("dark", dark);
+        els.themeBtn.textContent = dark ? "🌙" : "☀️";
+        document.querySelector('meta[name="theme-color"]').setAttribute("content", dark ? "#0a0a0a" : "#fff7ed");
+        if (tg) {
+          try {
+            tg.setHeaderColor(dark ? "#a3e635" : "#bef264");
+            tg.setBackgroundColor(dark ? "#09090b" : "#fff7ed");
+          } catch (e) {}
+        }
+      }
+
+      function syncThemeFromTelegram() {
+        if (themeManual) {
+          applyTheme(themeManual);
+          return;
+        }
+        var scheme = tg && tg.colorScheme ? tg.colorScheme : (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+        applyTheme(scheme);
+      }
+
+      function updateSoundBtn() {
+        els.soundBtn.textContent = audio.enabled ? "🔊" : "🔇";
+      }
+
+      function setMainButton() {
+        if (!tg || !tg.MainButton) return;
+        var nameOk = !!(els.name.value || "").trim();
+        if (phase === "result") {
+          tg.MainButton.setParams({
+            text: "ПОДЕЛИТЬСЯ РЕЗУЛЬТАТОМ 📤",
+            color: "#84cc16",
+            text_color: "#000000",
+            is_visible: true,
+            is_active: true
+          });
+          return;
+        }
+        if (nameOk) {
+          tg.MainButton.setParams({
+            text: "РАССЧИТАТЬ ВЫКУП 🐑",
+            color: "#84cc16",
+            text_color: "#000000",
+            is_visible: true,
+            is_active: true
+          });
+        } else {
+          tg.MainButton.hide();
+        }
+      }
+
+      function showForm() {
+        phase = "form";
+        els.resultScreen.classList.add("hidden-screen");
+        els.formScreen.classList.remove("hidden-screen");
+        if (tg && tg.BackButton) tg.BackButton.hide();
+        setMainButton();
+        window.scrollTo(0, 0);
+      }
+
+      function showResult() {
+        phase = "result";
+        els.formScreen.classList.add("hidden-screen");
+        els.resultScreen.classList.remove("hidden-screen");
+        if (tg && tg.BackButton) tg.BackButton.show();
+        setMainButton();
+        window.scrollTo(0, 0);
+      }
+
+      function serialFor() {
+        var n = "";
+        for (var i = 0; i < 9; i++) n += Math.floor(Math.random() * 10);
+        return "№ БАРАН-" + n + "-VIP";
+      }
+
+      function fillExports(r) {
+        els.stName.textContent = r.name;
+        els.stCount.textContent = String(r.rams);
+        els.stVerdict.textContent = r.verdict;
+        els.stPerks.innerHTML = "";
+        r.perks.forEach(function (p) {
+          var d = document.createElement("div");
+          d.textContent = "✦ " + p;
+          d.setAttribute("style", "border:2px solid #a3e635;padding:7px 8px;font-size:12px;font-weight:800;background:#111;color:#bef264;");
+          els.stPerks.appendChild(d);
+        });
+
+        els.certName.textContent = r.name;
+        els.certCount.textContent = r.rams + " 🐑";
+        els.certVerdict.textContent = r.verdict;
+        els.certSerial.textContent = serialFor();
+        els.certDate.textContent = new Date().toLocaleDateString("ru-RU");
+        els.certPerks.innerHTML = "";
+        r.perks.forEach(function (p) {
+          var d = document.createElement("div");
+          d.textContent = p;
+          d.setAttribute("style", "border:2px solid #111;padding:6px 10px;font-size:13px;font-weight:800;background:#fef08a;");
+          els.certPerks.appendChild(d);
+        });
+      }
+
+      function calculate() {
+        var name = (els.name.value || "").trim();
+        if (!name) {
+          haptic("notify", "warning");
+          toast("Сначала впиши имя — бараны ждут фамилию невесты");
+          els.name.focus();
+          return;
+        }
+        var r = collect();
+        lastResult = r;
+        fillExports(r);
+        els.resultName.textContent = r.name;
+        els.resultVerdict.textContent = r.verdict;
+        els.breakdown.innerHTML = '<p class="display mb-2 text-sm font-black">Разбор комиссии</p>' +
+          '<p class="mb-2 text-xs font-bold">База Госкомитета: +50</p>' +
+          r.lines.map(function (row) {
+            var cls = row.pts >= 0 ? "text-lime-700 dark:text-lime-300" : "text-fuchsia-700 dark:text-fuchsia-300";
+            return '<div class="flex justify-between gap-3 border-b border-zinc-200 py-1.5 text-xs font-extrabold dark:border-zinc-700"><span>' +
+              escapeHtml(row.label) + '</span><span class="' + cls + '">' + fmtPts(row.pts) + "</span></div>";
+          }).join("") +
+          '<p class="mt-3 text-sm font-black">Итого: ' + r.rams + " 🐑 <span class='text-zinc-500'>(сырой счёт " + r.raw + ")</span></p>";
+
+        showResult();
+        countUp(els.resultCount, r.rams);
+        haptic("impact", "heavy");
+        if (r.rams < 0) haptic("notify", "error");
+        else if (r.rams < 40) haptic("notify", "warning");
+        else haptic("notify", "success");
+        audio.onResult(r.rams);
+        if (r.rams > 100) setTimeout(fireConfetti, 200);
+      }
+
+      function escapeHtml(s) {
+        return String(s).replace(/[&<>"']/g, function (c) {
+          return ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c];
+        });
+      }
+
+      var AD_MAIL = "mailto:irabotaros@gmail.com?subject=" + encodeURIComponent("Реклама в calc_bee");
+
+      function openAdMail(ev) {
+        if (ev) ev.preventDefault();
+        haptic("impact", "light");
+        if (tg && typeof tg.openLink === "function") {
+          try {
+            tg.openLink(AD_MAIL);
+            return;
+          } catch (e) {}
+        }
+        window.location.href = AD_MAIL;
+      }
+
+      function shareResult() {
+        var r = lastResult || collect();
+        var text = "🐑 Официальный калым-рейтинг\n" + r.name + ": " + r.rams + " баранов\n" + r.verdict + "\nРассчитай свой:";
+        var page = window.location.href.split("#")[0];
+        var url = "https://t.me/share/url?url=" + encodeURIComponent(page) + "&text=" + encodeURIComponent(text);
+        if (tg && typeof tg.openTelegramLink === "function") {
+          tg.openTelegramLink(url);
+          return;
+        }
+        var native = "tg://msg_url?url=" + encodeURIComponent(page) + "&text=" + encodeURIComponent(text);
+        window.location.href = native;
+        setTimeout(function () { window.open(url, "_blank"); }, 400);
+      }
+
+      function downloadDataUrl(dataUrl, filename) {
+        var a = document.createElement("a");
+        a.href = dataUrl;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+      }
+
+      function slug(name) {
+        return String(name).toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9а-яё_-]/gi, "").slice(0, 32) || "kalym";
+      }
+
+      function capture(el, opts) {
+        return html2canvas(el, Object.assign({
+          scale: 2,
+          useCORS: true,
+          backgroundColor: null,
+          logging: false
+        }, opts || {}));
+      }
+
+      function openPreview(dataUrl) {
+        els.previewImg.src = dataUrl;
+        els.previewModal.classList.remove("hidden");
+        els.previewModal.classList.add("flex");
+      }
+
+      function closePreview() {
+        els.previewModal.classList.add("hidden");
+        els.previewModal.classList.remove("flex");
+      }
+
+      async function exportStories() {
+        if (!lastResult) return;
+        toast("Рендерим Stories 9:16…");
+        try {
+          var canvas = await capture(els.storiesCard, { scale: 3, width: 360, height: 640, backgroundColor: "#09090b" });
+          var url = canvas.toDataURL("image/png");
+          downloadDataUrl(url, "kalym-stories-" + slug(lastResult.name) + ".png");
+          openPreview(url);
+          toast("Stories готовы 📱");
+        } catch (e) {
+          toast("Не вышло снять Stories. Попробуй ещё раз");
+        }
+      }
+
+      async function exportCertPng() {
+        if (!lastResult) return;
+        toast("Печатаем сертификат…");
+        try {
+          var canvas = await capture(els.certCard, { scale: 2, width: 1123, height: 794, backgroundColor: "#fff8e7" });
+          var url = canvas.toDataURL("image/png");
+          downloadDataUrl(url, "kalym-cert-" + slug(lastResult.name) + ".png");
+          openPreview(url);
+          toast("Сертификат готов 📜");
+        } catch (e) {
+          toast("Сертификат не распечатался. Ещё раз?");
+        }
+      }
+
+      async function exportCertPdf() {
+        if (!lastResult) return;
+        toast("Сшиваем PDF…");
+        try {
+          var canvas = await capture(els.certCard, { scale: 2, width: 1123, height: 794, backgroundColor: "#fff8e7" });
+          var img = canvas.toDataURL("image/png");
+          var jsPDF = window.jspdf && window.jspdf.jsPDF;
+          if (!jsPDF) throw new Error("jsPDF missing");
+          var pdf = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
+          var w = pdf.internal.pageSize.getWidth();
+          var h = pdf.internal.pageSize.getHeight();
+          pdf.addImage(img, "PNG", 0, 0, w, h);
+          pdf.save("kalym-cert-" + slug(lastResult.name) + ".pdf");
+          toast("PDF ускакал в загрузки 📄");
+        } catch (e) {
+          toast("PDF не собрался. Попробуй PNG");
+        }
+      }
+
+      function bindInputs() {
+        els.form.addEventListener("change", function (ev) {
+          var t = ev.target;
+          if (t && (t.type === "radio" || t.type === "checkbox" || t.tagName === "SELECT")) {
+            haptic("impact", "light");
+            audio.click();
+          }
+          updateLive();
+        });
+        els.age.addEventListener("input", updateLive);
+        els.name.addEventListener("input", function () {
+          setMainButton();
+          updateLive();
+        });
+        els.form.addEventListener("submit", function (ev) {
+          ev.preventDefault();
+          calculate();
+        });
+      }
+
+      function initTelegram() {
+        if (!tg) return;
+        try { tg.ready(); tg.expand(); } catch (e) {}
+        try { tg.enableClosingConfirmation(); } catch (e) {}
+        var first = tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.first_name;
+        if (first && !(els.name.value || "").trim()) els.name.value = first;
+        tg.onEvent("themeChanged", function () {
+          if (!themeManual) syncThemeFromTelegram();
+        });
+        if (tg.MainButton) {
+          tg.MainButton.onClick(function () {
+            if (phase === "result") shareResult();
+            else calculate();
+          });
+        }
+        if (tg.BackButton) {
+          tg.BackButton.onClick(showForm);
+          tg.BackButton.hide();
+        }
+        if (typeof tg.viewportHeight === "number") {
+          document.body.style.minHeight = tg.viewportHeight + "px";
+          tg.onEvent("viewportChanged", function () {
+            document.body.style.minHeight = tg.viewportHeight + "px";
+          });
+        }
+        setMainButton();
+      }
+
+      els.soundBtn.addEventListener("click", function () {
+        audio.enabled = !audio.enabled;
+        localStorage.setItem("kalym-sound", audio.enabled ? "on" : "off");
+        updateSoundBtn();
+        if (audio.enabled) {
+          audio.ensure();
+          audio.click();
+        }
+        haptic("impact", "light");
+      });
+
+      els.themeBtn.addEventListener("click", function () {
+        var next = document.documentElement.classList.contains("dark") ? "light" : "dark";
+        themeManual = next;
+        localStorage.setItem("kalym-theme", next);
+        applyTheme(next);
+        haptic("impact", "light");
+        audio.click();
+      });
+
+      document.getElementById("adMail").addEventListener("click", openAdMail);
+
+      els.storiesBtn.addEventListener("click", exportStories);
+      els.certPngBtn.addEventListener("click", exportCertPng);
+      els.certPdfBtn.addEventListener("click", exportCertPdf);
+      els.shareBtn.addEventListener("click", shareResult);
+      els.againBtn.addEventListener("click", showForm);
+      els.closePreview.addEventListener("click", closePreview);
+      els.previewModal.addEventListener("click", function (ev) {
+        if (ev.target === els.previewModal) closePreview();
+      });
+
+      updateSoundBtn();
+      syncThemeFromTelegram();
+      bindInputs();
+      initTelegram();
+      updateLive();
+    })();
+  </script>
+</body>
+</html>
