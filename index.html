@@ -161,6 +161,22 @@
       top: 0;
       pointer-events: none;
     }
+    #storiesCard,
+    #stPanel,
+    #certCard,
+    #certInner {
+      box-sizing: border-box;
+    }
+    #stPanel {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 100%;
+    }
+    #stStamp,
+    #certStamp {
+      position: relative;
+    }
     .stamp {
       transform: rotate(-14deg);
       display: flex;
@@ -304,33 +320,42 @@
   </div>
 
   <div class="export-stage" aria-hidden="true">
-    <div id="storiesCard" style="width:360px;height:640px;background:linear-gradient(160deg,#f0abfc 0%,#a3e635 42%,#22d3ee 100%);padding:18px;box-sizing:border-box;font-family:'Unbounded','Manrope',sans-serif;color:#0a0a0a;position:relative;overflow:hidden;">
-      <div id="stWallpaper" style="position:absolute;inset:0;opacity:.18;font-size:42px;line-height:1.4;word-break:break-all;padding:8px;">🐑🐑🐑🐑🐑🐑🐑🐑🐑🐑🐑🐑🐑🐑🐑🐑</div>
-      <div id="stPanel" style="position:relative;height:100%;border:4px solid #000;box-shadow:8px 8px 0 #000;background:#09090b;color:#fafafa;padding:18px;box-sizing:border-box;display:flex;flex-direction:column;">
-        <div id="stBadge" style="border:3px solid #a3e635;background:#a3e635;color:#000;padding:8px 10px;font-weight:900;font-size:13px;letter-spacing:.04em;text-align:center;line-height:1.25;">ОФИЦИАЛЬНЫЙ КАЛЫМ-РЕЙТИНГ 🐑</div>
-        <p id="stName" style="margin:14px 0 0;font-size:24px;font-weight:900;line-height:1.15;word-break:break-word;"></p>
-        <p id="stLabel" style="margin:12px 0 0;font-size:12px;font-weight:800;color:#bef264;letter-spacing:.08em;">БАРАНОВ К ВЫКУПУ · ШКАЛА 0–100</p>
-        <p id="stCount" style="margin:2px 0 0;font-size:72px;font-weight:900;line-height:.9;color:#a3e635;">0</p>
-        <p id="stScale" style="margin:0;font-size:14px;font-weight:800;color:#a3e635;">/ 100 🐑</p>
-        <p id="stVerdict" style="margin:10px 0 0;padding-right:120px;font-size:15px;font-weight:800;line-height:1.3;color:#f0abfc;"></p>
-        <div id="stPerks" style="margin-top:10px;margin-right:120px;display:flex;flex-direction:column;gap:6px;"></div>
-        <div id="stStamp" class="stamp stamp-round" style="position:absolute;right:14px;bottom:196px;width:110px;height:110px;border:5px solid #ef4444;color:#ef4444;font-size:11px;background:rgba(0,0,0,.35);">ПРОВЕРЕНО<br/>100% ВЫКУП</div>
-        <div style="margin-top:auto;display:flex;flex-direction:column;gap:8px;position:relative;z-index:2;">
-          <p style="margin:0;font-size:9px;font-weight:700;color:#a1a1aa;">Kalym Bureau · юмор · 0 животных не пострадало</p>
-          <div id="stAdBanner" style="border:2px solid #000;background:#fde047;color:#0a0a0a;padding:8px 9px;box-shadow:4px 4px 0 #000;">
-            <p id="stAdTitle" style="margin:0;font-family:'Unbounded',sans-serif;font-size:11px;font-weight:900;line-height:1.2;">📢 Место для вашей рекламы</p>
-            <p id="stAdText" style="margin:4px 0 0;font-family:'Manrope',sans-serif;font-size:10px;font-weight:800;line-height:1.25;">Хочешь тут разместить свою рекламу? Пиши: @andreyros</p>
-            <p id="stAdSubject" style="margin:3px 0 0;font-family:'Manrope',sans-serif;font-size:9px;font-weight:700;"></p>
+    <div id="storiesCard" style="width:360px;height:640px;background:linear-gradient(160deg,#f0abfc 0%,#a3e635 42%,#22d3ee 100%);padding:12px;box-sizing:border-box;font-family:'Unbounded','Manrope',sans-serif;color:#0a0a0a;position:relative;overflow:hidden;">
+      <div id="stWallpaper" style="position:absolute;inset:0;opacity:.14;font-size:36px;line-height:1.35;word-break:break-all;padding:8px;pointer-events:none;">🐑🐑🐑🐑🐑🐑🐑🐑🐑🐑🐑🐑🐑🐑🐑🐑</div>
+      <div id="stPanel" style="position:relative;display:flex;flex-direction:column;justify-content:space-between;height:calc(100% - 4px);width:calc(100% - 4px);box-sizing:border-box;border:3px solid #000;box-shadow:4px 4px 0 #000;background:#09090b;color:#fafafa;padding:12px 12px 16px;overflow:visible;">
+        <div id="stHead" style="flex-shrink:0;">
+          <div id="stBadge" style="display:flex;align-items:center;justify-content:center;gap:6px;border:3px solid #a3e635;background:#a3e635;color:#000;padding:7px 8px;font-weight:900;font-size:12px;letter-spacing:.04em;text-align:center;line-height:1;">ОФИЦИАЛЬНЫЙ КАЛЫМ-РЕЙТИНГ <span style="font-size:28px;line-height:1;">🐑</span></div>
+          <p id="stName" style="margin:10px 0 0;font-size:20px;font-weight:900;line-height:1.15;word-break:break-word;color:#fafafa;"></p>
+          <p id="stLabel" style="margin:8px 0 0;font-size:11px;font-weight:800;color:#fafafa;letter-spacing:.08em;opacity:0.9;">БАРАНОВ К ВЫКУПУ</p>
+          <div id="stScoreRow" style="display:flex;align-items:center;gap:12px;margin-top:6px;">
+            <p id="stCount" style="margin:0;font-size:56px;line-height:1;font-weight:900;color:#fafafa;flex-shrink:0;">0</p>
+            <p id="stScale" style="margin:0;padding:5px 8px;font-size:13px;font-weight:800;line-height:1;color:#0a0a0a;background:#fde047;border:2px solid #0a0a0a;flex-shrink:0;">/ 100 🐑</p>
+          </div>
+        </div>
+        <div id="stMid" style="display:flex;align-items:flex-start;gap:12px;flex:1;min-height:0;margin:10px 0;">
+          <div id="stCopy" style="flex:1;min-width:0;padding-right:2px;overflow:visible;">
+            <p id="stVerdict" style="margin:0;font-size:13px;font-weight:800;line-height:1.25;color:#f0abfc;"></p>
+            <div id="stPerks" style="margin-top:8px;display:flex;flex-direction:column;gap:6px;"></div>
+          </div>
+          <div id="stStampWrap" style="flex-shrink:0;width:124px;height:124px;display:flex;align-items:center;justify-content:center;overflow:visible;">
+            <div id="stStamp" class="stamp stamp-round" style="position:relative;width:76px;height:76px;border:4px solid #ef4444;color:#ef4444;font-size:9px;background:rgba(0,0,0,.35);">ПРОВЕРЕНО<br/>100% ВЫКУП</div>
+          </div>
+        </div>
+        <div id="stFooter" style="margin-top:auto;flex-shrink:0;display:flex;flex-direction:column;gap:6px;">
+          <div id="stAdBanner" style="border:2px solid #000;background:#fde047;color:#0a0a0a;padding:5px 7px;box-shadow:3px 3px 0 #000;">
+            <p id="stAdTitle" style="margin:0;font-family:'Unbounded',sans-serif;font-size:10px;font-weight:900;line-height:1.2;">📢 Место для вашей рекламы</p>
+            <p id="stAdText" style="margin:2px 0 0;font-family:'Manrope',sans-serif;font-size:9px;font-weight:800;line-height:1.2;">Хочешь тут разместить свою рекламу? Пиши: @andreyros</p>
+            <p id="stAdSubject" style="display:none;margin:0;font-size:0;line-height:0;"></p>
           </div>
           <a id="stBotLink" href="https://t.me/calc_bee_bot" target="_blank" rel="noopener noreferrer"
-            style="display:flex;align-items:center;justify-content:center;gap:6px;border:3px solid #000;background:#a3e635;color:#0a0a0a;padding:7px 10px;font-weight:900;font-size:12px;line-height:1.2;text-decoration:none;box-shadow:4px 4px 0 #000;">🤖 Бот: @calc_bee_bot</a>
+            style="display:flex;align-items:center;justify-content:center;height:28px;box-sizing:border-box;border:2px solid #000;background:#a3e635;color:#0a0a0a;padding:0 8px;font-weight:900;font-size:12px;line-height:1;text-decoration:none;box-shadow:3px 3px 0 #000;">🤖 @calc_bee_bot</a>
         </div>
       </div>
     </div>
 
-    <div id="certCard" style="width:1123px;height:794px;background:#fff8e7;padding:28px;box-sizing:border-box;font-family:'Manrope',serif;color:#1c1917;">
-      <div id="certInner" style="height:100%;border:8px double #111;padding:28px;box-sizing:border-box;position:relative;background:repeating-linear-gradient(0deg,rgba(0,0,0,.015) 0 2px,transparent 2px 8px),#fffdf6;">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:24px;">
+    <div id="certCard" style="width:1123px;height:794px;background:#fff8e7;padding:24px;box-sizing:border-box;font-family:'Manrope',serif;color:#1c1917;">
+      <div id="certInner" style="height:100%;border:8px double #111;padding:22px 24px;box-sizing:border-box;position:relative;display:flex;flex-direction:column;overflow:hidden;background:repeating-linear-gradient(0deg,rgba(0,0,0,.015) 0 2px,transparent 2px 8px),#fffdf6;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:24px;flex-shrink:0;">
           <div id="certCrest" style="width:92px;height:92px;border:4px solid #111;border-radius:999px;display:flex;align-items:center;justify-content:center;font-size:46px;background:#fde047;box-shadow:6px 6px 0 #111;">🐑</div>
           <div style="flex:1;text-align:center;">
             <p style="margin:0;font-family:'Unbounded',sans-serif;font-size:13px;font-weight:900;letter-spacing:.18em;text-transform:uppercase;">Государственный комитет по оценке калыма</p>
@@ -340,28 +365,38 @@
           </div>
           <div id="certOrder" style="width:92px;height:92px;border:4px solid #111;display:flex;align-items:center;justify-content:center;text-align:center;font-family:'Unbounded',sans-serif;font-size:11px;font-weight:900;line-height:1.2;background:#a3e635;box-shadow:6px 6px 0 #111;">ПРИКАЗ<br/>ГКОК<br/>24/7</div>
         </div>
-        <p style="margin:28px 0 0;text-align:center;font-size:18px;font-weight:700;">Настоящим подтверждается, что по итогам независимой экспертизы</p>
-        <p id="certName" style="margin:12px 0 0;text-align:center;font-family:'Unbounded',sans-serif;font-size:40px;font-weight:900;"></p>
-        <p style="margin:10px 0 0;text-align:center;font-size:20px;font-weight:800;">признана достойной официального калыма по шкале 0–100 в размере</p>
-        <p id="certCount" style="margin:8px 0 0;text-align:center;font-family:'Unbounded',sans-serif;font-size:72px;font-weight:900;color:#365314;">0 / 100 🐑</p>
-        <p id="certVerdict" style="margin:8px auto 0;max-width:860px;text-align:center;font-size:22px;font-weight:800;"></p>
-        <div id="certPerks" style="margin:16px auto 0;max-width:640px;min-height:52px;display:flex;gap:8px;flex-wrap:wrap;justify-content:center;position:relative;z-index:1;"></div>
-        <div style="position:absolute;left:48px;bottom:168px;">
-          <p style="margin:0;font-size:13px;font-weight:700;">Дата выдачи: <span id="certDate"></span></p>
-          <p style="margin:4px 0 0;font-size:13px;font-weight:700;">Место: пастбище №7, цифровой аул</p>
+        <p style="margin:18px 0 0;text-align:center;font-size:18px;font-weight:700;flex-shrink:0;">Настоящим подтверждается, что по итогам независимой экспертизы</p>
+        <p id="certName" style="margin:10px 0 0;text-align:center;font-family:'Unbounded',sans-serif;font-size:40px;font-weight:900;flex-shrink:0;"></p>
+        <p style="margin:8px 0 0;text-align:center;font-size:18px;font-weight:800;flex-shrink:0;">признана достойной официального калыма по шкале 0–100 в размере</p>
+        <p id="certCount" style="margin:6px 0 0;text-align:center;font-family:'Unbounded',sans-serif;font-size:60px;font-weight:900;line-height:1;color:#1c1917;flex-shrink:0;">0 / 100 🐑</p>
+        <p id="certVerdict" style="margin:6px auto 0;max-width:860px;text-align:center;font-size:20px;font-weight:800;flex-shrink:0;"></p>
+        <div style="display:flex;align-items:flex-end;gap:24px;margin-top:12px;flex:1;min-height:0;">
+          <div style="flex:1;min-width:0;">
+            <div id="certPerks" style="max-width:620px;display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-start;"></div>
+            <div style="margin-top:18px;display:flex;justify-content:space-between;align-items:flex-end;gap:16px;max-width:720px;">
+              <div>
+                <p style="margin:0;font-size:13px;font-weight:700;">Дата выдачи: <span id="certDate"></span></p>
+                <p style="margin:4px 0 0;font-size:13px;font-weight:700;">Место: пастбище №7, цифровой аул</p>
+              </div>
+              <div style="text-align:center;flex-shrink:0;">
+                <p style="margin:0;font-family:'Brush Script MT','Segoe Script',cursive;font-size:36px;line-height:1;transform:rotate(-8deg);">Чабанъ</p>
+                <p style="margin:2px 0 0;font-size:11px;font-weight:800;letter-spacing:.12em;">ПОДПИСЬ ЧАБАНА</p>
+              </div>
+            </div>
+          </div>
+          <div style="flex-shrink:0;width:168px;display:flex;align-items:center;justify-content:center;padding-bottom:4px;">
+            <div id="certStamp" class="stamp stamp-round" style="position:relative;z-index:1;width:132px;height:132px;border:7px solid #b91c1c;color:#b91c1c;font-family:'Unbounded',sans-serif;font-size:13px;background:rgba(255,255,255,.55);">ПРОВЕРЕНО<br/>100% ВЫКУП</div>
+          </div>
         </div>
-        <div style="position:absolute;right:220px;bottom:164px;text-align:center;">
-          <p style="margin:0;font-family:'Brush Script MT','Segoe Script',cursive;font-size:42px;transform:rotate(-8deg);">Чабанъ</p>
-          <p style="margin:0;font-size:12px;font-weight:800;letter-spacing:.12em;">ПОДПИСЬ ЧАБАНА</p>
+        <div style="margin-top:auto;flex-shrink:0;display:flex;flex-direction:column;gap:8px;padding-top:16px;">
+          <div id="certAdBanner" style="position:relative;border:2px solid #111;background:#fde047;color:#0a0a0a;padding:7px 12px;box-shadow:4px 4px 0 #111;">
+            <p id="certAdTitle" style="margin:0;font-family:'Unbounded',sans-serif;font-size:14px;font-weight:900;line-height:1.2;">📢 Место для вашей рекламы</p>
+            <p id="certAdText" style="margin:3px 0 0;font-family:'Manrope',sans-serif;font-size:12px;font-weight:800;line-height:1.3;">Хочешь тут разместить свою рекламу? Пиши: @andreyros</p>
+            <p id="certAdSubject" style="margin:2px 0 0;font-family:'Manrope',sans-serif;font-size:11px;font-weight:700;"></p>
+          </div>
+          <a id="certBotMark" href="https://t.me/calc_bee_bot" target="_blank" rel="noopener noreferrer"
+            style="position:relative;display:block;border:3px solid #111;background:#111;color:#fde047;padding:7px 12px;font-size:13px;font-weight:800;line-height:1.25;text-align:center;text-decoration:none;letter-spacing:.01em;box-shadow:4px 4px 0 #111;">Электронная верификация калыма: t.me/calc_bee_bot | Сертификат выдан через @calc_bee_bot</a>
         </div>
-        <div id="certStamp" class="stamp stamp-round" style="position:absolute;right:40px;bottom:168px;z-index:1;width:150px;height:150px;border:7px solid #b91c1c;color:#b91c1c;font-family:'Unbounded',sans-serif;font-size:14px;background:rgba(255,255,255,.55);">ПРОВЕРЕНО<br/>100% ВЫКУП</div>
-        <div id="certAdBanner" style="position:absolute;left:28px;right:28px;bottom:54px;border:2px solid #111;background:#fde047;color:#0a0a0a;padding:8px 12px;box-shadow:4px 4px 0 #111;">
-          <p id="certAdTitle" style="margin:0;font-family:'Unbounded',sans-serif;font-size:14px;font-weight:900;line-height:1.2;">📢 Место для вашей рекламы</p>
-          <p id="certAdText" style="margin:3px 0 0;font-family:'Manrope',sans-serif;font-size:12px;font-weight:800;line-height:1.3;">Хочешь тут разместить свою рекламу? Пиши: @andreyros</p>
-          <p id="certAdSubject" style="margin:2px 0 0;font-family:'Manrope',sans-serif;font-size:11px;font-weight:700;"></p>
-        </div>
-        <a id="certBotMark" href="https://t.me/calc_bee_bot" target="_blank" rel="noopener noreferrer"
-          style="position:absolute;left:28px;right:28px;bottom:12px;display:block;border:3px solid #111;background:#111;color:#fde047;padding:7px 12px;font-size:13px;font-weight:800;line-height:1.25;text-align:center;text-decoration:none;letter-spacing:.01em;box-shadow:4px 4px 0 #111;">Электронная верификация калыма: t.me/calc_bee_bot | Сертификат выдан через @calc_bee_bot</a>
       </div>
     </div>
   </div>
@@ -491,7 +526,8 @@
         {
           min: 0, max: 9, title: "Тотальный дефицит",
           bg: "#e5e7eb", dark: "#18181b", accent: "#4b5563", ink: "#111827",
-          stInk: "#f4f4f5", verdict: "#a1a1aa", badgeInk: "#111827",
+          stInk: "#f4f4f5", score: "#f4f4f5", verdict: "#e4e4e7", badgeInk: "#fafafa",
+          line: "Тотальный дефицит: лучше вернуть и выбрать другую отару",
           crest: "🏚️", extra: "📦",
           wallpaper: "🏚️📦🏚️📦🏚️📦🏚️📦🏚️📦",
           stOuter: "repeating-linear-gradient(-12deg,#e5e7eb 0 10px,#d4d4d8 10px 14px)",
@@ -503,7 +539,8 @@
         {
           min: 10, max: 19, title: "Бюджетный стартап",
           bg: "#d6d3d1", dark: "#292524", accent: "#78350f", ink: "#1c1917",
-          stInk: "#fafaf9", verdict: "#fcd34d", badgeInk: "#fff7ed",
+          stInk: "#fafaf9", score: "#fcd34d", verdict: "#fcd34d", badgeInk: "#fff7ed",
+          line: "Бюджетный стартап: требует доработок и терпения",
           crest: "📦", extra: "🔧",
           wallpaper: "📦🔧📦🔧📦🔧📦🔧📦🔧",
           stOuter: "repeating-linear-gradient(135deg,#d6d3d1 0 14px,#a8a29e 14px 16px)",
@@ -515,7 +552,8 @@
         {
           min: 20, max: 29, title: "Студенческий эконом",
           bg: "#dbeafe", dark: "#1e3a8a", accent: "#eab308", ink: "#1e3a8a",
-          stInk: "#eff6ff", verdict: "#fde047", badgeInk: "#1e3a8a",
+          stInk: "#eff6ff", score: "#fde047", verdict: "#fde047", badgeInk: "#1e3a8a",
+          line: "Студенческий эконом: сдано на тройку, но с огоньком",
           crest: "🍜", extra: "🎒",
           wallpaper: "🍜🎒🍜🎒🍜🎒🍜🎒🍜🎒",
           stOuter: "repeating-linear-gradient(0deg,#93c5fd 0 1px,transparent 1px 22px),repeating-linear-gradient(90deg,#93c5fd 0 1px,transparent 1px 22px),#dbeafe",
@@ -527,7 +565,8 @@
         {
           min: 30, max: 39, title: "Базовый городской",
           bg: "#ccfbf1", dark: "#134e4a", accent: "#0f766e", ink: "#134e4a",
-          stInk: "#f0fdfa", verdict: "#99f6e4", badgeInk: "#f0fdfa",
+          stInk: "#f0fdfa", score: "#5eead4", verdict: "#99f6e4", badgeInk: "#f0fdfa",
+          line: "Базовый городской: стандарт-пакет без сюрпризов",
           crest: "☕", extra: "🏙️",
           wallpaper: "☕🏙️☕🏙️☕🏙️☕🏙️☕🏙️",
           stOuter: "linear-gradient(160deg,#ccfbf1 0%,#99f6e4 100%)",
@@ -539,7 +578,8 @@
         {
           min: 40, max: 49, title: "Твердый середняк",
           bg: "#ecfccb", dark: "#365314", accent: "#4d7c0f", ink: "#365314",
-          stInk: "#f7fee7", verdict: "#d9f99d", badgeInk: "#14532d",
+          stInk: "#f7fee7", score: "#bef264", verdict: "#d9f99d", badgeInk: "#f7fee7",
+          line: "Твердый середняк: семья кивает, торг уместен",
           crest: "🌾", extra: "🏡",
           wallpaper: "🌾🏡🌾🏡🌾🏡🌾🏡🌾🏡",
           stOuter: "linear-gradient(150deg,#ecfccb 0%,#bef264 100%)",
@@ -551,62 +591,67 @@
         {
           min: 50, max: 59, title: "Золотая середина",
           bg: "#fef9c3", dark: "#166534", accent: "#166534", ink: "#14532d",
-          stInk: "#f7fee7", verdict: "#fde047", badgeInk: "#14532d",
+          stInk: "#f7fee7", score: "#fde047", verdict: "#fde047", badgeInk: "#f7fee7",
+          line: "Золотая середина: надежный восточный комфорт",
           crest: "🐑", extra: "✨",
           wallpaper: "🐑✨🐑✨🐑✨🐑✨🐑✨",
           stOuter: "linear-gradient(160deg,#fef9c3 0%,#86efac 55%,#166534 100%)",
           certInner: "repeating-linear-gradient(0deg,rgba(0,0,0,.02) 0 2px,transparent 2px 8px),#fffbeb",
           certBorder: "8px double #166534",
           crestBg: "#fde047", perkBg: "#fef08a", perkBorder: "#166534",
-          stamp: { shape: "round", color: "#b91c1c", bg: "rgba(255,255,255,.62)", lines: ["ЗНАК КАЧЕСТВА", "ГОСТ"] }
+          stamp: { shape: "round", color: "#b91c1c", bg: "rgba(255,255,255,.62)", lines: ["ГОСТ", "ЗНАК"] }
         },
         {
           min: 60, max: 69, title: "Комфорт-плюс",
           bg: "#cffafe", dark: "#155e75", accent: "#0891b2", ink: "#164e63",
-          stInk: "#ecfeff", verdict: "#67e8f9", badgeInk: "#083344",
-          crest: "🚘", extra: "💎",
-          wallpaper: "🚘💎🚘💎🚘💎🚘💎🚘💎",
+          stInk: "#ecfeff", score: "#67e8f9", verdict: "#67e8f9", badgeInk: "#ecfeff", badgeBg: "#155e75",
+          line: "Комфорт-плюс: проверенный выбор без драмы",
+          crest: "🚘", extra: "🥂",
+          wallpaper: "🚘🥂🚘🥂🚘🥂🚘🥂🚘🥂",
           stOuter: "linear-gradient(155deg,#cffafe 0%,#22d3ee 50%,#155e75 100%)",
           certInner: "linear-gradient(180deg,#ecfeff 0%,#cffafe 100%)",
           certBorder: "7px solid #155e75",
           crestBg: "#67e8f9", perkBg: "#ecfeff", perkBorder: "#155e75",
-          stamp: { shape: "round", color: "#0f766e", bg: "rgba(204,251,241,.88)", lines: ["ПРОВЕРЕННЫЙ", "ВЫБОР"] }
+          stamp: { shape: "round", color: "#0f766e", bg: "rgba(204,251,241,.88)", lines: ["ВЫБОР", "PLUS"] }
         },
         {
           min: 70, max: 79, title: "Бизнес-класс",
           bg: "#e0e7ff", dark: "#3730a3", accent: "#4338ca", ink: "#1e1b4b",
-          stInk: "#eef2ff", verdict: "#c7d2fe", badgeInk: "#eef2ff",
+          stInk: "#f8fafc", score: "#ffffff", verdict: "#e0e7ff", badgeInk: "#eef2ff",
+          line: "Бизнес-класс: одобрено, можно выписывать чек",
           crest: "💼", extra: "🍷",
           wallpaper: "💼🍷💼🍷💼🍷💼🍷💼🍷",
           stOuter: "linear-gradient(160deg,#e0e7ff 0%,#818cf8 45%,#312e81 100%)",
           certInner: "linear-gradient(180deg,#eef2ff 0%,#e0e7ff 100%)",
           certBorder: "8px double #3730a3",
           crestBg: "#a5b4fc", perkBg: "#e0e7ff", perkBorder: "#3730a3",
-          stamp: { shape: "wax", color: "#1e3a8a", bg: "rgba(199,210,254,.92)", lines: ["APPROVED", "BUSINESS CLASS"] }
+          stamp: { shape: "wax", color: "#1e3a8a", bg: "rgba(199,210,254,.92)", lines: ["APPROVED", "CLASS"] }
         },
         {
-          min: 80, max: 89, title: "Премиум-невеста / Шейх-люкс",
+          min: 80, max: 89, title: "Премиум-невеста / Шейх-люкс", shortTitle: "Премиум / Шейх-люкс",
           bg: "#f3e8ff", dark: "#581c87", accent: "#ca8a04", ink: "#3b0764",
-          stInk: "#faf5ff", verdict: "#fde047", badgeInk: "#3b0764",
+          stInk: "#faf5ff", score: "#fde047", verdict: "#fde047", badgeInk: "#3b0764",
+          line: "Премиум-невеста: шейхи занимают очередь с ночи",
           crest: "👑", extra: "💎",
           wallpaper: "👑💎👑💎👑💎👑💎👑💎",
           stOuter: "linear-gradient(155deg,#f3e8ff 0%,#c084fc 40%,#581c87 100%)",
           certInner: "radial-gradient(circle at 80% 20%,rgba(250,204,21,.22),transparent 36%),#faf5ff",
           certBorder: "8px double #ca8a04",
           crestBg: "#fde047", perkBg: "#fef9c3", perkBorder: "#ca8a04",
-          stamp: { shape: "wax", color: "#ca8a04", bg: "rgba(254,243,199,.92)", lines: ["VIP SELECTION", "ШЕЙХ ОДОБРЯЕТ"] }
+          stamp: { shape: "wax", color: "#ca8a04", bg: "rgba(254,243,199,.92)", lines: ["VIP", "ШЕЙХ"] }
         },
         {
           min: 90, max: 100, title: "Султанский джекпот",
           bg: "#ffe4e6", dark: "#881337", accent: "#be123c", ink: "#4c0519",
-          stInk: "#fff1f2", verdict: "#fecdd3", badgeInk: "#4c0519",
+          stInk: "#fff1f2", score: "#fde047", verdict: "#ffe4e6", badgeInk: "#fff1f2",
+          line: "Султанский джекпот: султан продал дворец и весь гарем",
           crest: "🕌", extra: "🔥",
           wallpaper: "🕌🔥🕌🔥🕌🔥🕌🔥🕌🔥",
           stOuter: "linear-gradient(155deg,#ffe4e6 0%,#fb7185 38%,#881337 100%)",
           certInner: "radial-gradient(circle at 50% 0%,rgba(250,204,21,.28),transparent 42%),#fff1f2",
           certBorder: "8px double #881337",
           crestBg: "#fda4af", perkBg: "#fecdd3", perkBorder: "#881337",
-          stamp: { shape: "wax", color: "#be123c", bg: "rgba(255,228,230,.92)", lines: ["СУЛТАНСКИЙ ДЖЕКПОТ", "100% ВЫКУП"] }
+          stamp: { shape: "wax", color: "#be123c", bg: "rgba(255,228,230,.92)", lines: ["ДЖЕКПОТ", "100%"] }
         }
       ];
 
@@ -963,11 +1008,8 @@
       }
 
       function verdictOf(n) {
-        if (n <= 25) return "Бюджетный стартап: требует доработок и терпения";
-        if (n <= 50) return "Студенческий тариф: экономно, но с огоньком";
-        if (n <= 75) return "Золотой фонд: надежный восточный комфорт";
-        if (n <= 90) return "Премиум-невеста: шейхи занимают очередь с ночи";
-        return "Абсолютный джекпот: султан продал дворец и весь гарем";
+        var t = tierOf(n);
+        return t.line || t.title;
       }
 
       function fmtPts(n) {
@@ -1132,7 +1174,10 @@
         setAdSubjectLine(els.adSubject, telegram);
         if (els.stAdTitle) els.stAdTitle.textContent = AD_CONFIG.title;
         if (els.stAdText) els.stAdText.textContent = line;
-        setAdSubjectLine(els.stAdSubject, telegram);
+        if (els.stAdSubject) {
+          els.stAdSubject.textContent = "";
+          els.stAdSubject.style.display = "none";
+        }
         if (els.certAdTitle) els.certAdTitle.textContent = AD_CONFIG.title;
         if (els.certAdText) els.certAdText.textContent = line;
         setAdSubjectLine(els.certAdSubject, telegram);
@@ -1144,7 +1189,7 @@
         if (els.stBotLink) {
           els.stBotLink.href = BOT_CONFIG.url;
           els.stBotLink.title = BOT_CONFIG.label;
-          els.stBotLink.textContent = "🤖 Бот: " + handle;
+          els.stBotLink.textContent = "🤖 " + handle;
         }
         if (els.certBotMark) {
           els.certBotMark.href = BOT_CONFIG.url;
@@ -1185,24 +1230,29 @@
         var cert = kind === "cert";
         el.className = "stamp stamp-" + s.shape;
         el.innerHTML = s.lines.map(function (line) { return escapeHtml(line); }).join("<br/>");
+        el.style.position = "relative";
+        el.style.left = "auto";
+        el.style.right = "auto";
+        el.style.bottom = "auto";
+        el.style.top = "auto";
         el.style.color = s.color;
         el.style.borderColor = s.color;
         el.style.background = s.bg;
         el.style.borderStyle = "solid";
-        el.style.borderWidth = cert ? "7px" : "5px";
-        el.style.fontSize = cert ? "13px" : "10px";
-        el.style.padding = "8px";
+        el.style.borderWidth = cert ? "6px" : "4px";
+        el.style.fontSize = cert ? "12px" : "9px";
+        el.style.padding = cert ? "8px" : "6px";
         el.style.clipPath = "none";
         el.style.boxShadow = "none";
-        el.style.paddingTop = "8px";
+        el.style.paddingTop = cert ? "8px" : "6px";
         if (s.shape === "rect") {
           el.style.borderRadius = "8px";
-          el.style.width = cert ? "176px" : "124px";
-          el.style.height = cert ? "96px" : "74px";
+          el.style.width = cert ? "168px" : "96px";
+          el.style.height = cert ? "90px" : "56px";
         } else if (s.shape === "triangle") {
-          var tw = cert ? 168 : 122;
-          var th = cert ? 150 : 114;
-          var fs = cert ? 12 : 10;
+          var tw = cert ? 156 : 84;
+          var th = cert ? 140 : 78;
+          var fs = cert ? 12 : 9;
           el.style.borderRadius = "0";
           el.style.width = tw + "px";
           el.style.height = th + "px";
@@ -1216,11 +1266,31 @@
             '<text x="60" y="88" text-anchor="middle" fill="#ffffff" font-family="Unbounded,Manrope,sans-serif" font-size="' + fs + '" font-weight="900">' + escapeHtml(s.lines[1] || "") + "</text>" +
             "</svg>";
         } else {
+          var dim = cert ? 132 : 88;
+          var longest = 0;
+          s.lines.forEach(function (line) { longest = Math.max(longest, String(line).length); });
+          var fs = cert
+            ? (longest > 8 ? 10 : 12)
+            : (longest > 8 ? 8 : 10);
           el.style.borderRadius = "999px";
-          el.style.width = cert ? "150px" : "110px";
-          el.style.height = cert ? "150px" : "110px";
+          el.style.width = dim + "px";
+          el.style.height = dim + "px";
+          el.style.fontSize = fs + "px";
+          el.style.lineHeight = "1.15";
+          el.style.letterSpacing = "0.02em";
+          el.style.padding = cert ? "16px 14px" : "12px 10px";
+          el.style.overflow = "hidden";
+          el.style.flexDirection = "column";
+          el.style.justifyContent = "center";
+          el.style.alignItems = "center";
+          el.style.gap = "1px";
+          el.innerHTML = s.lines.map(function (line) {
+            return '<span style="display:block;white-space:nowrap;line-height:1.15;">' + escapeHtml(line) + "</span>";
+          }).join("");
           if (s.shape === "wax") {
-            el.style.boxShadow = "0 0 0 4px " + s.bg + ", 0 0 0 8px " + s.color;
+            el.style.boxShadow = cert
+              ? "0 0 0 3px " + s.bg + ", 0 0 0 6px " + s.color
+              : "0 0 0 2px " + s.bg + ", 0 0 0 4px " + s.color;
           }
         }
       }
@@ -1234,14 +1304,29 @@
           els.stPanel.style.color = tier.stInk;
         }
         if (els.stBadge) {
-          els.stBadge.style.background = tier.accent;
-          els.stBadge.style.borderColor = tier.accent;
+          var badgeBg = tier.badgeBg || tier.accent;
+          els.stBadge.style.display = "flex";
+          els.stBadge.style.alignItems = "center";
+          els.stBadge.style.justifyContent = "center";
+          els.stBadge.style.gap = "6px";
+          els.stBadge.style.background = badgeBg;
+          els.stBadge.style.borderColor = badgeBg;
           els.stBadge.style.color = tier.badgeInk;
-          els.stBadge.textContent = tier.title.toUpperCase() + " " + tier.crest;
+          els.stBadge.innerHTML = "<span>" + escapeHtml((tier.shortTitle || tier.title).toUpperCase()) +
+            '</span><span aria-hidden="true" style="font-size:28px;line-height:1;display:inline-block;flex-shrink:0;transform:translateY(-1px);">' + escapeHtml(tier.crest) + "</span>";
         }
-        if (els.stLabel) els.stLabel.style.color = tier.accent;
-        if (els.stCount) els.stCount.style.color = tier.accent;
-        if (els.stScale) els.stScale.style.color = tier.accent;
+        var scoreColor = tier.score || "#fafafa";
+        if (els.stName) els.stName.style.color = tier.stInk;
+        if (els.stLabel) {
+          els.stLabel.style.color = scoreColor;
+          els.stLabel.style.opacity = "0.9";
+        }
+        if (els.stCount) els.stCount.style.color = scoreColor;
+        if (els.stScale) {
+          els.stScale.style.background = "#fde047";
+          els.stScale.style.borderColor = "#0a0a0a";
+          els.stScale.style.color = "#0a0a0a";
+        }
         if (els.stVerdict) els.stVerdict.style.color = tier.verdict;
         applyStamp(els.stStamp, tier, "stories");
 
@@ -1267,7 +1352,8 @@
           els.certTierTitle.textContent = tier.crest + " " + tier.title + " · " + tier.min + "–" + tier.max;
           els.certTierTitle.style.color = tier.accent;
         }
-        if (els.certCount) els.certCount.style.color = tier.accent;
+        if (els.certName) els.certName.style.color = tier.ink;
+        if (els.certCount) els.certCount.style.color = tier.ink;
         if (els.certVerdict) els.certVerdict.style.color = tier.ink;
         applyStamp(els.certStamp, tier, "cert");
       }
@@ -1280,10 +1366,10 @@
         els.stCount.textContent = String(r.rams);
         els.stVerdict.textContent = r.verdict;
         els.stPerks.innerHTML = "";
-        r.perks.forEach(function (p) {
+        r.perks.slice(0, 2).forEach(function (p) {
           var d = document.createElement("div");
           d.textContent = "✦ " + p;
-          d.setAttribute("style", "border:2px solid " + tier.accent + ";padding:5px 7px;font-size:11px;font-weight:800;background:" + tier.dark + ";color:" + tier.verdict + ";");
+          d.setAttribute("style", "border:2px solid " + tier.accent + ";box-sizing:border-box;padding:5px 7px;font-size:11px;line-height:1.35;font-weight:800;background:" + tier.dark + ";color:" + tier.verdict + ";white-space:normal;overflow:visible;word-break:break-word;flex-shrink:0;");
           els.stPerks.appendChild(d);
         });
 
