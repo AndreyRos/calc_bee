@@ -83,6 +83,38 @@
       50% { filter: drop-shadow(0 0 10px rgba(163, 230, 53, 0.85)); }
     }
     .neon-pulse { animation: neon-pulse 2.2s ease-in-out infinite; }
+    .ad-copy-btn {
+      background: #fff;
+      transition: background-color 0.28s ease, color 0.28s ease;
+    }
+    .dark .ad-copy-btn { background: #fef08a; }
+    .ad-copy-btn.is-copied {
+      background: #a3e635;
+      animation: ad-copy-pop 0.48s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .dark .ad-copy-btn.is-copied { background: #bef264; }
+    .ad-copy-btn:disabled {
+      cursor: default;
+      pointer-events: none;
+    }
+    .ad-copy-icon {
+      display: inline-block;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+    .ad-copy-btn.is-copied .ad-copy-icon {
+      animation: ad-copy-icon-swap 0.35s ease;
+    }
+    @keyframes ad-copy-pop {
+      0% { transform: scale(1); }
+      28% { transform: scale(0.95); }
+      62% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+    @keyframes ad-copy-icon-swap {
+      0% { opacity: 1; transform: scale(1) rotate(0deg); }
+      40% { opacity: 0; transform: scale(0.55) rotate(-14deg); }
+      100% { opacity: 1; transform: scale(1) rotate(0deg); }
+    }
     input[type="range"] {
       -webkit-appearance: none;
       appearance: none;
@@ -179,165 +211,11 @@
             class="w-full border-2 border-black bg-yellow-100 px-3 py-3 text-base font-extrabold outline-none placeholder:font-bold placeholder:text-zinc-500 dark:border-white dark:bg-zinc-800 dark:text-white" />
         </fieldset>
 
-        <fieldset class="brutal bg-white p-4 dark:bg-zinc-900">
-          <div class="mb-2 flex items-end justify-between gap-2">
-            <label for="age" class="display text-sm font-black">2. Возраст</label>
-            <span id="ageMeta" class="text-right text-xs font-extrabold text-lime-700 dark:text-lime-300">24 · +15</span>
-          </div>
-          <input id="age" name="age" type="range" min="18" max="60" value="24" />
-          <p id="ageHint" class="mt-2 text-sm font-bold">18–25: молодой потенциал (+15)</p>
-        </fieldset>
-
-        <fieldset class="brutal bg-white p-4 dark:bg-zinc-900">
-          <label for="cook" class="display mb-2 block text-sm font-black">3. Кулинарные сверхспособности</label>
-          <select id="cook" name="cook"
-            class="w-full border-2 border-black bg-orange-200 px-3 py-3 text-sm font-extrabold outline-none dark:border-white dark:bg-orange-900 dark:text-white">
-            <option value="35" data-label="Шеф уровня Мишлен: борщ лечит любые травмы">Шеф уровня Мишлен: борщ лечит любые травмы (+35)</option>
-            <option value="15" data-label="Съедобно, скорую пока не вызывали" selected>Съедобно, скорую пока не вызывали (+15)</option>
-            <option value="0" data-label="Спец по открыванию контейнеров из доставки">Спец по открыванию контейнеров из доставки (+0)</option>
-            <option value="-25" data-label="Умею поджигать даже воду">Умею поджигать даже воду (−25)</option>
-          </select>
-        </fieldset>
-
-        <fieldset class="brutal bg-white p-4 dark:bg-zinc-900">
-          <legend class="display mb-3 text-sm font-black">4. Характер и настроение</legend>
-          <div class="grid gap-2" id="mood-group">
-            <label class="option-card brutal-press flex cursor-pointer items-start gap-2 border-2 border-black bg-zinc-50 p-3 dark:border-white dark:bg-zinc-800">
-              <input type="radio" name="mood" value="30" data-label="Спокойная, как удав на солнце" class="mt-1" />
-              <span class="text-sm font-extrabold">Спокойная, как удав на солнце <span class="text-lime-700 dark:text-lime-300">+30</span></span>
-            </label>
-            <label class="option-card brutal-press flex cursor-pointer items-start gap-2 border-2 border-black bg-zinc-50 p-3 dark:border-white dark:bg-zinc-800">
-              <input type="radio" name="mood" value="15" data-label="Милая, но глаз иногда дергается" checked class="mt-1" />
-              <span class="text-sm font-extrabold">Милая, но глаз иногда дергается <span class="text-lime-700 dark:text-lime-300">+15</span></span>
-            </label>
-            <label class="option-card brutal-press flex cursor-pointer items-start gap-2 border-2 border-black bg-zinc-50 p-3 dark:border-white dark:bg-zinc-800">
-              <input type="radio" name="mood" value="-15" data-label="«Ой, всё!» звучит 14 раз в день" class="mt-1" />
-              <span class="text-sm font-extrabold">«Ой, всё!» звучит 14 раз в день <span class="text-fuchsia-700 dark:text-fuchsia-300">−15</span></span>
-            </label>
-            <label class="option-card brutal-press flex cursor-pointer items-start gap-2 border-2 border-black bg-zinc-50 p-3 dark:border-white dark:bg-zinc-800">
-              <input type="radio" name="mood" value="-30" data-label="Слушает True Crime и знает, как спрятать тело" class="mt-1" />
-              <span class="text-sm font-extrabold">Слушает True Crime и знает, как спрятать тело <span class="text-fuchsia-700 dark:text-fuchsia-300">−30</span></span>
-            </label>
-          </div>
-        </fieldset>
-
-        <fieldset class="brutal bg-white p-4 dark:bg-zinc-900">
-          <legend class="display mb-3 text-sm font-black">5. Отношение к шопингу и маркетплейсам</legend>
-          <div class="grid gap-2">
-            <label class="option-card brutal-press flex cursor-pointer items-start gap-2 border-2 border-black bg-zinc-50 p-3 dark:border-white dark:bg-zinc-800">
-              <input type="radio" name="shop" value="40" data-label="Удалила Wildberries и Ozon ради экономии" class="mt-1" />
-              <span class="text-sm font-extrabold">Удалила Wildberries и Ozon ради экономии <span class="text-lime-700 dark:text-lime-300">+40</span></span>
-            </label>
-            <label class="option-card brutal-press flex cursor-pointer items-start gap-2 border-2 border-black bg-zinc-50 p-3 dark:border-white dark:bg-zinc-800">
-              <input type="radio" name="shop" value="15" data-label="Покупает только нужные вещи по скидкам" checked class="mt-1" />
-              <span class="text-sm font-extrabold">Покупает только нужные вещи по скидкам <span class="text-lime-700 dark:text-lime-300">+15</span></span>
-            </label>
-            <label class="option-card brutal-press flex cursor-pointer items-start gap-2 border-2 border-black bg-zinc-50 p-3 dark:border-white dark:bg-zinc-800">
-              <input type="radio" name="shop" value="-20" data-label="Курьеры здороваются за руку и знают кота по имени" class="mt-1" />
-              <span class="text-sm font-extrabold">Курьеры здороваются за руку и знают кота по имени <span class="text-fuchsia-700 dark:text-fuchsia-300">−20</span></span>
-            </label>
-            <label class="option-card brutal-press flex cursor-pointer items-start gap-2 border-2 border-black bg-zinc-50 p-3 dark:border-white dark:bg-zinc-800">
-              <input type="radio" name="shop" value="-35" data-label="Пункты выдачи — её второй дом" class="mt-1" />
-              <span class="text-sm font-extrabold">Пункты выдачи — её второй дом <span class="text-fuchsia-700 dark:text-fuchsia-300">−35</span></span>
-            </label>
-          </div>
-        </fieldset>
-
-        <fieldset class="brutal bg-white p-4 dark:bg-zinc-900">
-          <legend class="display mb-3 text-sm font-black">6. Ориентация в пространстве и авто</legend>
-          <div class="grid gap-2">
-            <label class="option-card brutal-press flex cursor-pointer items-start gap-2 border-2 border-black bg-zinc-50 p-3 dark:border-white dark:bg-zinc-800">
-              <input type="radio" name="drive" value="30" data-label="Паркуется задом с закрытыми глазами по зеркалам" class="mt-1" />
-              <span class="text-sm font-extrabold">Паркуется задом с закрытыми глазами по зеркалам <span class="text-lime-700 dark:text-lime-300">+30</span></span>
-            </label>
-            <label class="option-card brutal-press flex cursor-pointer items-start gap-2 border-2 border-black bg-zinc-50 p-3 dark:border-white dark:bg-zinc-800">
-              <input type="radio" name="drive" value="10" data-label="Ездит уверенно, путает только лево и право" checked class="mt-1" />
-              <span class="text-sm font-extrabold">Ездит уверенно, путает только лево и право <span class="text-lime-700 dark:text-lime-300">+10</span></span>
-            </label>
-            <label class="option-card brutal-press flex cursor-pointer items-start gap-2 border-2 border-black bg-zinc-50 p-3 dark:border-white dark:bg-zinc-800">
-              <input type="radio" name="drive" value="-15" data-label="«Поверните направо через 100 метров» вызывает панику" class="mt-1" />
-              <span class="text-sm font-extrabold">«Поверните направо через 100 метров» вызывает панику <span class="text-fuchsia-700 dark:text-fuchsia-300">−15</span></span>
-            </label>
-            <label class="option-card brutal-press flex cursor-pointer items-start gap-2 border-2 border-black bg-zinc-50 p-3 dark:border-white dark:bg-zinc-800">
-              <input type="radio" name="drive" value="0" data-label="Пешеход с пожизненным абонементом на такси" class="mt-1" />
-              <span class="text-sm font-extrabold">Пешеход с пожизненным абонементом на такси <span class="text-zinc-600 dark:text-zinc-300">+0</span></span>
-            </label>
-          </div>
-        </fieldset>
-
-        <fieldset class="brutal bg-white p-4 dark:bg-zinc-900">
-          <legend class="display mb-3 text-sm font-black">7. Сборы и пунктуальность</legend>
-          <div class="grid gap-2">
-            <label class="option-card brutal-press flex cursor-pointer items-start gap-2 border-2 border-black bg-zinc-50 p-3 dark:border-white dark:bg-zinc-800">
-              <input type="radio" name="time" value="35" data-label="Готова за 15 минут, включая макияж" class="mt-1" />
-              <span class="text-sm font-extrabold">Готова за 15 минут, включая макияж <span class="text-lime-700 dark:text-lime-300">+35</span></span>
-            </label>
-            <label class="option-card brutal-press flex cursor-pointer items-start gap-2 border-2 border-black bg-zinc-50 p-3 dark:border-white dark:bg-zinc-800">
-              <input type="radio" name="time" value="-15" data-label="«Выхожу через 5 минут» (на самом деле моет голову)" checked class="mt-1" />
-              <span class="text-sm font-extrabold">«Выхожу через 5 минут» (на самом деле моет голову) <span class="text-fuchsia-700 dark:text-fuchsia-300">−15</span></span>
-            </label>
-            <label class="option-card brutal-press flex cursor-pointer items-start gap-2 border-2 border-black bg-zinc-50 p-3 dark:border-white dark:bg-zinc-800">
-              <input type="radio" name="time" value="-30" data-label="Собирается 3 часа, чтобы в итоге никуда не пойти" class="mt-1" />
-              <span class="text-sm font-extrabold">Собирается 3 часа, чтобы в итоге никуда не пойти <span class="text-fuchsia-700 dark:text-fuchsia-300">−30</span></span>
-            </label>
-          </div>
-        </fieldset>
-
-        <fieldset class="brutal bg-white p-4 dark:bg-zinc-900">
-          <legend class="display mb-3 text-sm font-black">8. Мемная эрудиция</legend>
-          <div class="grid gap-2">
-            <label class="option-card brutal-press flex cursor-pointer items-start gap-2 border-2 border-black bg-zinc-50 p-3 dark:border-white dark:bg-zinc-800">
-              <input type="radio" name="meme" value="25" data-label="Отвечает стикерами в тему и цитирует постиронию" class="mt-1" />
-              <span class="text-sm font-extrabold">Отвечает стикерами в тему и цитирует постиронию <span class="text-lime-700 dark:text-lime-300">+25</span></span>
-            </label>
-            <label class="option-card brutal-press flex cursor-pointer items-start gap-2 border-2 border-black bg-zinc-50 p-3 dark:border-white dark:bg-zinc-800">
-              <input type="radio" name="meme" value="10" data-label="Понимает базовые мемы с котами" checked class="mt-1" />
-              <span class="text-sm font-extrabold">Понимает базовые мемы с котами <span class="text-lime-700 dark:text-lime-300">+10</span></span>
-            </label>
-            <label class="option-card brutal-press flex cursor-pointer items-start gap-2 border-2 border-black bg-zinc-50 p-3 dark:border-white dark:bg-zinc-800">
-              <input type="radio" name="meme" value="-20" data-label="Присылает открытки «С добрым утром» в WhatsApp" class="mt-1" />
-              <span class="text-sm font-extrabold">Присылает открытки «С добрым утром» в WhatsApp <span class="text-fuchsia-700 dark:text-fuchsia-300">−20</span></span>
-            </label>
-          </div>
-        </fieldset>
-
-        <fieldset class="brutal bg-white p-4 dark:bg-zinc-900">
-          <legend class="display mb-3 text-sm font-black">9. Секретные бонусы</legend>
-          <div class="grid gap-2">
-            <label class="chk brutal-press flex cursor-pointer items-start gap-2 border-2 border-black bg-zinc-50 p-3 dark:border-white dark:bg-zinc-800">
-              <input type="checkbox" name="bonus" value="20" data-label="Знает, чем офсайд отличается от аута" class="mt-1 h-4 w-4" />
-              <span class="text-sm font-extrabold">Знает, чем офсайд отличается от аута <span class="text-lime-700 dark:text-lime-200">+20</span></span>
-            </label>
-            <label class="chk brutal-press flex cursor-pointer items-start gap-2 border-2 border-black bg-zinc-50 p-3 dark:border-white dark:bg-zinc-800">
-              <input type="checkbox" name="bonus" value="25" data-label="Не заставляет фотографировать её по 40 минут на закате" class="mt-1 h-4 w-4" />
-              <span class="text-sm font-extrabold">Не заставляет фотографировать её по 40 минут на закате <span class="text-lime-700 dark:text-lime-200">+25</span></span>
-            </label>
-            <label class="chk brutal-press flex cursor-pointer items-start gap-2 border-2 border-black bg-zinc-50 p-3 dark:border-white dark:bg-zinc-800">
-              <input type="checkbox" name="bonus" value="30" data-label="Не спрашивает: «А кто эта шмара, лайкнувшая пост 2017 года?»" class="mt-1 h-4 w-4" />
-              <span class="text-sm font-extrabold">Не спрашивает: «А кто эта шмара, лайкнувшая пост 2017 года?» <span class="text-lime-700 dark:text-lime-200">+30</span></span>
-            </label>
-            <label class="chk brutal-press flex cursor-pointer items-start gap-2 border-2 border-black bg-zinc-50 p-3 dark:border-white dark:bg-zinc-800">
-              <input type="checkbox" name="bonus" value="-15" data-label="Забирает картошку фри со словами «Я только попробовать»" class="mt-1 h-4 w-4" />
-              <span class="text-sm font-extrabold">Забирает картошку фри со словами «Я только попробовать» <span class="text-fuchsia-700 dark:text-fuchsia-200">−15</span></span>
-            </label>
-            <label class="chk brutal-press flex cursor-pointer items-start gap-2 border-2 border-black bg-zinc-50 p-3 dark:border-white dark:bg-zinc-800">
-              <input type="checkbox" name="bonus" value="-20" data-label="Верит в ретроградный Меркурий и карту таро" class="mt-1 h-4 w-4" />
-              <span class="text-sm font-extrabold">Верит в ретроградный Меркурий и карту таро <span class="text-fuchsia-700 dark:text-fuchsia-200">−20</span></span>
-            </label>
-            <label class="chk brutal-press flex cursor-pointer items-start gap-2 border-2 border-black bg-zinc-50 p-3 dark:border-white dark:bg-zinc-800">
-              <input type="checkbox" name="bonus" value="-10" data-label="Забывает пароли от всех аккаунтов раз в неделю" class="mt-1 h-4 w-4" />
-              <span class="text-sm font-extrabold">Забывает пароли от всех аккаунтов раз в неделю <span class="text-fuchsia-700 dark:text-fuchsia-200">−10</span></span>
-            </label>
-            <label class="chk brutal-press flex cursor-pointer items-start gap-2 border-2 border-black bg-zinc-50 p-3 dark:border-white dark:bg-zinc-800">
-              <input type="checkbox" name="bonus" value="15" data-label="Любит чипсы с крабом и посиделки в гараже" class="mt-1 h-4 w-4" />
-              <span class="text-sm font-extrabold">Любит чипсы с крабом и посиделки в гараже <span class="text-lime-700 dark:text-lime-200">+15</span></span>
-            </label>
-          </div>
-        </fieldset>
+        <div id="questionBlocks" class="space-y-4"></div>
 
         <div class="brutal bg-cyan-300 px-4 py-3 text-black dark:bg-cyan-400">
-          <p class="text-xs font-black uppercase tracking-wide">Черновая оценка Госкомитета</p>
-          <p id="liveScore" class="display text-2xl font-black">~50 🐑</p>
+          <p class="text-xs font-black uppercase tracking-wide">Черновая оценка Госкомитета · шкала 0–100</p>
+          <p id="liveScore" class="display text-2xl font-black">~70 🐑 из 100</p>
         </div>
 
         <button id="calcBtn" type="submit" class="brutal brutal-press w-full bg-lime-400 py-4 text-lg font-black text-black dark:bg-lime-400">
@@ -348,11 +226,11 @@
 
     <section id="screen-result" class="hidden-screen space-y-4">
       <div class="brutal bg-yellow-300 p-5 text-black dark:bg-yellow-400">
-        <p class="text-xs font-black uppercase tracking-widest">Итоговый калым</p>
+        <p class="text-xs font-black uppercase tracking-widest">Итоговый калым · шкала 0–100</p>
         <p id="resultName" class="display mt-1 text-xl font-black"></p>
         <p class="mt-3 flex items-end gap-2">
           <span id="resultCount" class="display text-7xl font-black leading-none">0</span>
-          <span class="display pb-2 text-2xl font-black">🐑</span>
+          <span class="display pb-2 text-2xl font-black">/ 100 🐑</span>
         </p>
         <p id="resultVerdict" class="mt-3 text-base font-extrabold leading-snug"></p>
       </div>
@@ -360,22 +238,40 @@
       <div id="breakdown" class="brutal bg-white p-4 dark:bg-zinc-900"></div>
 
       <div class="grid gap-3">
-        <button id="storiesBtn" type="button" class="brutal brutal-press w-full bg-fuchsia-400 py-3 text-sm font-black text-black">📱 Скачать Stories (9:16 PNG)</button>
-        <button id="certPngBtn" type="button" class="brutal brutal-press w-full bg-cyan-300 py-3 text-sm font-black text-black">📜 Скачать сертификат (PNG)</button>
-        <button id="certPdfBtn" type="button" class="brutal brutal-press w-full bg-orange-300 py-3 text-sm font-black text-black">📄 Скачать в PDF</button>
+        <div class="grid gap-2">
+          <label for="exportFormat" class="display text-xs font-black uppercase tracking-wide">Формат экспорта</label>
+          <div class="relative">
+            <select id="exportFormat"
+              class="brutal w-full appearance-none bg-white px-3 py-3 pr-10 text-sm font-extrabold outline-none border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:border-white dark:bg-zinc-900 dark:text-white dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)]">
+              <option value="stories">📱 Stories (9:16 PNG)</option>
+              <option value="cert-png">📜 Сертификат (PNG)</option>
+              <option value="cert-pdf">📄 Сертификат (PDF)</option>
+            </select>
+            <span class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm font-black" aria-hidden="true">▾</span>
+          </div>
+          <button id="exportBtn" type="button"
+            class="brutal brutal-press w-full bg-fuchsia-400 py-3 text-sm font-black text-black border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:border-white dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)]">
+            📥 Экспортировать результат
+          </button>
+        </div>
         <button id="shareBtn" type="button" class="brutal brutal-press w-full bg-lime-400 py-3 text-sm font-black text-black">Поделиться в Telegram 📤</button>
         <button id="againBtn" type="button" class="brutal brutal-press w-full bg-white py-3 text-sm font-black text-black dark:bg-zinc-900 dark:text-white">Пересчитать калым</button>
       </div>
     </section>
 
-    <aside id="adBanner" class="brutal mt-8 bg-yellow-300 p-4 text-black dark:bg-yellow-400">
-      <p class="display text-base font-black">📢 Место для вашей рекламы</p>
+    <aside id="adBanner" class="brutal mt-8 cursor-pointer bg-yellow-300 p-4 text-black dark:bg-yellow-400">
+      <p id="adTitle" class="display text-base font-black">📢 Место для вашей рекламы</p>
       <p class="mt-2 text-sm font-extrabold leading-snug">
-        Хочешь тут разместить свою рекламу? Пиши на email:
-        <a id="adMail" href="mailto:irabotaros@gmail.com?subject=%D0%A0%D0%B5%D0%BA%D0%BB%D0%B0%D0%BC%D0%B0%20%D0%B2%20calc_bee"
-          class="underline decoration-2 underline-offset-2">irabotaros@gmail.com</a>
+        <span id="adText">Хочешь тут разместить свою рекламу? Пиши:</span>
+        <a id="adLink" href="https://t.me/andreyros" target="_blank" rel="noopener noreferrer"
+          class="underline decoration-2 underline-offset-2">@andreyros</a>
+        <button id="adCopyBtn" type="button"
+          class="ad-copy-btn brutal brutal-press ml-2 inline-flex items-center gap-1 px-2.5 py-1 align-middle text-[11px] font-black text-black">
+          <span class="ad-copy-icon" id="adCopyIcon">📋</span>
+          <span id="adCopyLabel">Скопировать</span>
+        </button>
       </p>
-      <p class="mt-1 text-xs font-bold">Тема письма: Реклама в calc_bee</p>
+      <p id="adSubject" class="mt-1 text-xs font-bold"></p>
     </aside>
 
     <footer class="mt-5 border-t-2 border-black pb-4 pt-4 text-center text-[11px] font-bold leading-relaxed text-zinc-600 dark:border-white dark:text-zinc-400">
@@ -398,13 +294,23 @@
       <div style="position:absolute;inset:0;opacity:.18;font-size:42px;line-height:1.4;word-break:break-all;padding:8px;">🐑🐑🐑🐑🐑🐑🐑🐑🐑🐑🐑🐑🐑🐑🐑🐑</div>
       <div style="position:relative;height:100%;border:4px solid #000;box-shadow:8px 8px 0 #000;background:#09090b;color:#fafafa;padding:18px;box-sizing:border-box;display:flex;flex-direction:column;">
         <div style="border:3px solid #a3e635;background:#a3e635;color:#000;padding:8px 10px;font-weight:900;font-size:13px;letter-spacing:.04em;text-align:center;line-height:1.25;">ОФИЦИАЛЬНЫЙ КАЛЫМ-РЕЙТИНГ 🐑</div>
-        <p id="stName" style="margin:22px 0 0;font-size:26px;font-weight:900;line-height:1.15;word-break:break-word;"></p>
-        <p style="margin:18px 0 0;font-size:13px;font-weight:800;color:#bef264;letter-spacing:.08em;">БАРАНОВ К ВЫКУПУ</p>
-        <p id="stCount" style="margin:4px 0 0;font-size:96px;font-weight:900;line-height:.9;color:#a3e635;">0</p>
-        <p id="stVerdict" style="margin:16px 0 0;font-size:16px;font-weight:800;line-height:1.3;color:#f0abfc;"></p>
-        <div id="stPerks" style="margin-top:16px;display:flex;flex-direction:column;gap:8px;"></div>
-        <div class="stamp" style="position:absolute;right:16px;bottom:72px;width:132px;height:132px;border:6px solid #ef4444;border-radius:999px;color:#ef4444;display:flex;align-items:center;justify-content:center;text-align:center;font-size:13px;font-weight:900;line-height:1.2;background:rgba(0,0,0,.35);">ПРОВЕРЕНО<br/>100% ВЫКУП</div>
-        <p style="margin-top:auto;font-size:10px;font-weight:700;color:#a1a1aa;">Kalym Bureau · юмор · 0 животных не пострадало</p>
+        <p id="stName" style="margin:14px 0 0;font-size:24px;font-weight:900;line-height:1.15;word-break:break-word;"></p>
+        <p style="margin:12px 0 0;font-size:12px;font-weight:800;color:#bef264;letter-spacing:.08em;">БАРАНОВ К ВЫКУПУ · ШКАЛА 0–100</p>
+        <p id="stCount" style="margin:2px 0 0;font-size:72px;font-weight:900;line-height:.9;color:#a3e635;">0</p>
+        <p id="stScale" style="margin:0;font-size:14px;font-weight:800;color:#a3e635;">/ 100 🐑</p>
+        <p id="stVerdict" style="margin:10px 0 0;padding-right:120px;font-size:15px;font-weight:800;line-height:1.3;color:#f0abfc;"></p>
+        <div id="stPerks" style="margin-top:10px;margin-right:120px;display:flex;flex-direction:column;gap:6px;"></div>
+        <div class="stamp" style="position:absolute;right:14px;bottom:196px;width:110px;height:110px;border:5px solid #ef4444;border-radius:999px;color:#ef4444;display:flex;align-items:center;justify-content:center;text-align:center;font-size:11px;font-weight:900;line-height:1.2;background:rgba(0,0,0,.35);">ПРОВЕРЕНО<br/>100% ВЫКУП</div>
+        <div style="margin-top:auto;display:flex;flex-direction:column;gap:8px;">
+          <p style="margin:0;font-size:9px;font-weight:700;color:#a1a1aa;">Kalym Bureau · юмор · 0 животных не пострадало</p>
+          <div id="stAdBanner" style="border:2px solid #000;background:#fde047;color:#0a0a0a;padding:8px 9px;box-shadow:4px 4px 0 #000;">
+            <p id="stAdTitle" style="margin:0;font-family:'Unbounded',sans-serif;font-size:11px;font-weight:900;line-height:1.2;">📢 Место для вашей рекламы</p>
+            <p id="stAdText" style="margin:4px 0 0;font-family:'Manrope',sans-serif;font-size:10px;font-weight:800;line-height:1.25;">Хочешь тут разместить свою рекламу? Пиши: @andreyros</p>
+            <p id="stAdSubject" style="margin:3px 0 0;font-family:'Manrope',sans-serif;font-size:9px;font-weight:700;"></p>
+          </div>
+          <a id="stBotLink" href="https://t.me/calc_bee_bot" target="_blank" rel="noopener noreferrer"
+            style="display:flex;align-items:center;justify-content:center;gap:6px;border:3px solid #000;background:#a3e635;color:#0a0a0a;padding:7px 10px;font-weight:900;font-size:12px;line-height:1.2;text-decoration:none;box-shadow:4px 4px 0 #000;">🤖 Бот: @calc_bee_bot</a>
+        </div>
       </div>
     </div>
 
@@ -421,19 +327,26 @@
         </div>
         <p style="margin:28px 0 0;text-align:center;font-size:18px;font-weight:700;">Настоящим подтверждается, что по итогам независимой экспертизы</p>
         <p id="certName" style="margin:12px 0 0;text-align:center;font-family:'Unbounded',sans-serif;font-size:40px;font-weight:900;"></p>
-        <p style="margin:10px 0 0;text-align:center;font-size:20px;font-weight:800;">признана достойной официального калыма в размере</p>
-        <p id="certCount" style="margin:8px 0 0;text-align:center;font-family:'Unbounded',sans-serif;font-size:72px;font-weight:900;color:#365314;">0 🐑</p>
+        <p style="margin:10px 0 0;text-align:center;font-size:20px;font-weight:800;">признана достойной официального калыма по шкале 0–100 в размере</p>
+        <p id="certCount" style="margin:8px 0 0;text-align:center;font-family:'Unbounded',sans-serif;font-size:72px;font-weight:900;color:#365314;">0 / 100 🐑</p>
         <p id="certVerdict" style="margin:8px auto 0;max-width:860px;text-align:center;font-size:22px;font-weight:800;"></p>
         <div id="certPerks" style="margin:22px auto 0;max-width:900px;display:flex;gap:10px;flex-wrap:wrap;justify-content:center;"></div>
-        <div style="position:absolute;left:48px;bottom:36px;">
+        <div style="position:absolute;left:48px;bottom:168px;">
           <p style="margin:0;font-size:13px;font-weight:700;">Дата выдачи: <span id="certDate"></span></p>
           <p style="margin:4px 0 0;font-size:13px;font-weight:700;">Место: пастбище №7, цифровой аул</p>
         </div>
-        <div style="position:absolute;right:220px;bottom:28px;text-align:center;">
+        <div style="position:absolute;right:220px;bottom:164px;text-align:center;">
           <p style="margin:0;font-family:'Brush Script MT','Segoe Script',cursive;font-size:42px;transform:rotate(-8deg);">Чабанъ</p>
           <p style="margin:0;font-size:12px;font-weight:800;letter-spacing:.12em;">ПОДПИСЬ ЧАБАНА</p>
         </div>
-        <div class="stamp" style="position:absolute;right:40px;bottom:40px;width:150px;height:150px;border:7px solid #b91c1c;border-radius:999px;color:#b91c1c;display:flex;align-items:center;justify-content:center;text-align:center;font-family:'Unbounded',sans-serif;font-size:14px;font-weight:900;line-height:1.2;background:rgba(255,255,255,.55);">ПРОВЕРЕНО<br/>100% ВЫКУП</div>
+        <div class="stamp" style="position:absolute;right:40px;bottom:168px;width:150px;height:150px;border:7px solid #b91c1c;border-radius:999px;color:#b91c1c;display:flex;align-items:center;justify-content:center;text-align:center;font-family:'Unbounded',sans-serif;font-size:14px;font-weight:900;line-height:1.2;background:rgba(255,255,255,.55);">ПРОВЕРЕНО<br/>100% ВЫКУП</div>
+        <div id="certAdBanner" style="position:absolute;left:28px;right:28px;bottom:54px;border:2px solid #111;background:#fde047;color:#0a0a0a;padding:8px 12px;box-shadow:4px 4px 0 #111;">
+          <p id="certAdTitle" style="margin:0;font-family:'Unbounded',sans-serif;font-size:14px;font-weight:900;line-height:1.2;">📢 Место для вашей рекламы</p>
+          <p id="certAdText" style="margin:3px 0 0;font-family:'Manrope',sans-serif;font-size:12px;font-weight:800;line-height:1.3;">Хочешь тут разместить свою рекламу? Пиши: @andreyros</p>
+          <p id="certAdSubject" style="margin:2px 0 0;font-family:'Manrope',sans-serif;font-size:11px;font-weight:700;"></p>
+        </div>
+        <a id="certBotMark" href="https://t.me/calc_bee_bot" target="_blank" rel="noopener noreferrer"
+          style="position:absolute;left:28px;right:28px;bottom:12px;display:block;border:3px solid #111;background:#111;color:#fde047;padding:7px 12px;font-size:13px;font-weight:800;line-height:1.25;text-align:center;text-decoration:none;letter-spacing:.01em;box-shadow:4px 4px 0 #111;">Электронная верификация калыма: t.me/calc_bee_bot | Сертификат выдан через @calc_bee_bot</a>
       </div>
     </div>
   </div>
@@ -441,6 +354,190 @@
   <script>
     (function () {
       "use strict";
+
+      const SCORE_MIN = 0;
+      const SCORE_MAX = 100;
+      const BLOCK_MAX = 10;
+
+      const QUESTION_BLOCKS = [
+        {
+          name: "cook",
+          title: "Кулинарные шедевры",
+          short: "Кухня",
+          options: [
+            { pts: 10, label: "Борщ и стейк ресторанного уровня" },
+            { pts: 7, label: "Вкусно и сытно" },
+            { pts: 3, label: "Мастер доставки Самоката" },
+            { pts: 0, label: "Сжигает даже пельмени в воде" }
+          ]
+        },
+        {
+          name: "mood",
+          title: "Характер и нервы",
+          short: "Характер",
+          options: [
+            { pts: 10, label: "Спокойна как тибетский монах" },
+            { pts: 7, label: "Милая, но с легкой перчинкой" },
+            { pts: 3, label: "Настроение меняется 10 раз в час" },
+            { pts: 0, label: "Слушает True Crime и точит ножи" }
+          ]
+        },
+        {
+          name: "shop",
+          title: "Отношение к шопингу",
+          short: "Шопинг",
+          options: [
+            { pts: 10, label: "Экономная, инвестирует в семью" },
+            { pts: 7, label: "Берет только нужное по скидкам" },
+            { pts: 3, label: "В пункте выдачи ее знают по имени" },
+            { pts: 0, label: "Живет на Wildberries и тратит лимит мужа" }
+          ]
+        },
+        {
+          name: "drive",
+          title: "Вождение и навигация",
+          short: "Авто",
+          options: [
+            { pts: 10, label: "Паркуется задом по зеркалам в миллиметре" },
+            { pts: 7, label: "Уверенный водитель, иногда путает право/лево" },
+            { pts: 3, label: "Боится кольцевого движения и навигатора" },
+            { pts: 0, label: "Пешеход с VIP-тарифом в такси" }
+          ]
+        },
+        {
+          name: "time",
+          title: "Скорость сборов",
+          short: "Сборы",
+          options: [
+            { pts: 10, label: "Готова за 15 минут с идеальной укладкой" },
+            { pts: 7, label: "30–40 минут и при полном параде" },
+            { pts: 3, label: "«Выхожу через 5 минут» (только моет голову)" },
+            { pts: 0, label: "Собирается 3 часа, чтобы в итоге остаться дома" }
+          ]
+        },
+        {
+          name: "meme",
+          title: "Чувство юмора и мемы",
+          short: "Юмор",
+          options: [
+            { pts: 10, label: "Богиня постиронии и острых шуток" },
+            { pts: 7, label: "Понимает сарказм и добрые мемы" },
+            { pts: 3, label: "Смеется только над котиками" },
+            { pts: 0, label: "Обижается на любую шутку и шлет открытки в WhatsApp" }
+          ]
+        },
+        {
+          name: "tidy",
+          title: "Уборка и уют",
+          short: "Уборка",
+          options: [
+            { pts: 10, label: "Идеальный порядок без пылинки за 20 минут" },
+            { pts: 7, label: "Творческий порядок и чистый дом" },
+            { pts: 3, label: "Генеральная уборка раз в месяц перед гостями" },
+            { pts: 0, label: "«Вещи на стуле — это гардероб»" }
+          ]
+        },
+        {
+          name: "hobbies",
+          title: "Разделение мужских интересов",
+          short: "Интересы",
+          options: [
+            { pts: 10, label: "Знает офсайд, любит гаражи и футбол" },
+            { pts: 7, label: "Смотрит фильмы и не мешает мужским посиделкам" },
+            { pts: 3, label: "Иногда отвлекает вопросами посреди матча" },
+            { pts: 0, label: "«Или я, или твоя рыбалка/компьютер»" }
+          ]
+        },
+        {
+          name: "social",
+          title: "Отношение к соцсетям",
+          short: "Соцсети",
+          options: [
+            { pts: 10, label: "Не ведет сторис и не заставляет ее фотать" },
+            { pts: 7, label: "Пара красивых фото из отпуска и всё" },
+            { pts: 3, label: "Фотографирует еду 10 минут перед едой" },
+            { pts: 0, label: "Часовая фотосессия на закате и скандал за лайк 2017 года" }
+          ]
+        },
+        {
+          name: "home",
+          title: "Домашний релакс и быт",
+          short: "Быт",
+          options: [
+            { pts: 10, label: "Массаж, вкусный чай и тишина после работы" },
+            { pts: 7, label: "Совместный просмотр сериалов с чипсами" },
+            { pts: 3, label: "Вечерние разговоры о ретроградном Меркурии" },
+            { pts: 0, label: "Пиление за невынесенный мусор 24/7" }
+          ]
+        }
+      ];
+
+      const BOT_CONFIG = { name: '@calc_bee_bot', url: 'https://t.me/calc_bee_bot', label: 'Узнай свой калым в Telegram: @calc_bee_bot' };
+      const AD_CONFIG = {
+        type: "telegram",
+        title: "📢 Место для вашей рекламы",
+        text: "Хочешь тут разместить свою рекламу? Пиши:",
+        telegramUsername: "@andreyros",
+        telegramUrl: "https://t.me/andreyros",
+        email: "irabotaros@gmail.com",
+        subject: "Реклама в calc_bee"
+      };
+
+      var AdTracker = {
+        KEY: "calc_bee_ad_stats",
+        lastEvent: null,
+        flushed: false,
+        empty: function () {
+          return {
+            banner_views: 0,
+            contact_clicks: 0,
+            copy_clicks: 0,
+            export_impressions: 0,
+            last_interaction: null
+          };
+        },
+        load: function () {
+          try {
+            var raw = localStorage.getItem(this.KEY);
+            if (!raw) return this.empty();
+            var data = JSON.parse(raw);
+            var base = this.empty();
+            Object.keys(base).forEach(function (k) {
+              if (data[k] != null) base[k] = data[k];
+            });
+            return base;
+          } catch (e) {
+            return this.empty();
+          }
+        },
+        save: function (data) {
+          try { localStorage.setItem(this.KEY, JSON.stringify(data)); } catch (e) {}
+        },
+        track: function (eventName) {
+          var stats = this.load();
+          if (typeof stats[eventName] === "number") stats[eventName] += 1;
+          stats.last_interaction = new Date().toISOString();
+          this.save(stats);
+          this.lastEvent = eventName;
+          try { console.log("[AdTracker] Event: " + eventName + " | Total: " + stats[eventName]); } catch (e) {}
+          return stats;
+        },
+        flushTelegram: function (type) {
+          if (this.flushed) return;
+          var ev = type || this.lastEvent;
+          if (ev !== "contact_clicks" && ev !== "copy_clicks") return;
+          if (!tg || typeof tg.sendData !== "function") return;
+          var payload = {
+            event: "ad_click",
+            type: ev,
+            stats: this.load()
+          };
+          try {
+            tg.sendData(JSON.stringify(payload));
+            this.flushed = true;
+          } catch (e) {}
+        }
+      };
 
       var tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
       var inTelegram = !!(tg && tg.initData);
@@ -453,10 +550,7 @@
         resultScreen: document.getElementById("screen-result"),
         form: document.getElementById("kalymForm"),
         name: document.getElementById("girlName"),
-        age: document.getElementById("age"),
-        ageMeta: document.getElementById("ageMeta"),
-        ageHint: document.getElementById("ageHint"),
-        cook: document.getElementById("cook"),
+        questionBlocks: document.getElementById("questionBlocks"),
         liveScore: document.getElementById("liveScore"),
         calcBtn: document.getElementById("calcBtn"),
         resultName: document.getElementById("resultName"),
@@ -465,9 +559,8 @@
         breakdown: document.getElementById("breakdown"),
         soundBtn: document.getElementById("soundBtn"),
         themeBtn: document.getElementById("themeBtn"),
-        storiesBtn: document.getElementById("storiesBtn"),
-        certPngBtn: document.getElementById("certPngBtn"),
-        certPdfBtn: document.getElementById("certPdfBtn"),
+        exportFormat: document.getElementById("exportFormat"),
+        exportBtn: document.getElementById("exportBtn"),
         shareBtn: document.getElementById("shareBtn"),
         againBtn: document.getElementById("againBtn"),
         toast: document.getElementById("toast"),
@@ -485,7 +578,23 @@
         certVerdict: document.getElementById("certVerdict"),
         certSerial: document.getElementById("certSerial"),
         certDate: document.getElementById("certDate"),
-        certPerks: document.getElementById("certPerks")
+        certPerks: document.getElementById("certPerks"),
+        stBotLink: document.getElementById("stBotLink"),
+        certBotMark: document.getElementById("certBotMark"),
+        adBanner: document.getElementById("adBanner"),
+        adTitle: document.getElementById("adTitle"),
+        adText: document.getElementById("adText"),
+        adLink: document.getElementById("adLink"),
+        adCopyBtn: document.getElementById("adCopyBtn"),
+        adCopyIcon: document.getElementById("adCopyIcon"),
+        adCopyLabel: document.getElementById("adCopyLabel"),
+        adSubject: document.getElementById("adSubject"),
+        stAdTitle: document.getElementById("stAdTitle"),
+        stAdText: document.getElementById("stAdText"),
+        stAdSubject: document.getElementById("stAdSubject"),
+        certAdTitle: document.getElementById("certAdTitle"),
+        certAdText: document.getElementById("certAdText"),
+        certAdSubject: document.getElementById("certAdSubject")
       };
 
       var audio = {
@@ -616,12 +725,12 @@
           this.bleat({ pitch: 210, duration: 0.9, sad: true, delay: 0.05, vol: 0.14 });
         },
         onResult: function (rams) {
-          if (rams > 90) {
+          if (rams >= 76) {
             this.fanfare();
             this.bleat({ pitch: 300, duration: 0.55, vol: 0.12 });
             this.bleat({ pitch: 360, duration: 0.6, delay: 0.12, vol: 0.1 });
             this.bleat({ pitch: 240, duration: 0.7, delay: 0.22, vol: 0.1 });
-          } else if (rams >= 40) {
+          } else if (rams >= 41) {
             this.bleat({ pitch: 280, duration: 0.75, vol: 0.16 });
           } else {
             this.fail();
@@ -644,10 +753,28 @@
         toast._t = setTimeout(function () { els.toast.classList.remove("show"); }, 2400);
       }
 
-      function ageInfo(age) {
-        if (age <= 25) return { pts: 15, label: "Молодой потенциал", hint: "18–25: молодой потенциал (+15)" };
-        if (age <= 35) return { pts: 20, label: "Опыт и мудрость", hint: "26–35: опыт и мудрость (+20)" };
-        return { pts: 30, label: "Элитный винтаж", hint: "36+: элитный винтаж (+30)" };
+      function ptsTone(pts) {
+        if (pts >= 10) return "text-lime-700 dark:text-lime-300";
+        if (pts >= 7) return "text-lime-700 dark:text-lime-300";
+        if (pts >= 3) return "text-zinc-600 dark:text-zinc-300";
+        return "text-fuchsia-700 dark:text-fuchsia-300";
+      }
+
+      function renderQuestionBlocks() {
+        if (!els.questionBlocks) return;
+        els.questionBlocks.innerHTML = QUESTION_BLOCKS.map(function (block, index) {
+          var opts = block.options.map(function (opt) {
+            var checked = opt.pts === 7 ? " checked" : "";
+            return '<label class="option-card brutal-press flex cursor-pointer items-start gap-2 border-2 border-black bg-zinc-50 p-3 dark:border-white dark:bg-zinc-800">' +
+              '<input type="radio" name="' + block.name + '" value="' + opt.pts + '" data-label="' + escapeHtml(opt.label) + '"' + checked + ' class="mt-1" />' +
+              '<span class="text-sm font-extrabold">' + escapeHtml(opt.label) +
+              ' <span class="' + ptsTone(opt.pts) + '">' + fmtPts(opt.pts) + "</span></span></label>";
+          }).join("");
+          return '<fieldset class="brutal bg-white p-4 dark:bg-zinc-900">' +
+            '<legend class="display mb-3 text-sm font-black">' + (index + 2) + ". " + escapeHtml(block.title) +
+            ' <span class="text-xs font-bold text-zinc-500 dark:text-zinc-400">0–' + BLOCK_MAX + "</span></legend>" +
+            '<div class="grid gap-2">' + opts + "</div></fieldset>";
+        }).join("");
       }
 
       function checkedRadio(name) {
@@ -656,56 +783,42 @@
 
       function collect() {
         var name = (els.name.value || "").trim() || "Безымянная";
-        var age = Number(els.age.value);
-        var a = ageInfo(age);
-        var cookOpt = els.cook.options[els.cook.selectedIndex];
         var lines = [];
-        var perks = [];
         var sum = 0;
 
-        function add(title, pts, label, perk) {
+        QUESTION_BLOCKS.forEach(function (block) {
+          var el = checkedRadio(block.name);
+          var pts = el ? Number(el.value) : 0;
+          var label = el ? el.getAttribute("data-label") : block.options[block.options.length - 1].label;
+          pts = Math.max(0, Math.min(BLOCK_MAX, pts));
           sum += pts;
-          lines.push({ title: title, pts: pts, label: label });
-          if (perk) perks.push(label);
-        }
-
-        add("Возраст " + age, a.pts, a.label, true);
-        add("Кухня", Number(cookOpt.value), cookOpt.getAttribute("data-label"), true);
-
-        ["mood", "shop", "drive", "time", "meme"].forEach(function (key) {
-          var el = checkedRadio(key);
-          if (!el) return;
-          add(key, Number(el.value), el.getAttribute("data-label"), true);
+          lines.push({ title: block.short, pts: pts, label: label });
         });
 
-        var titles = { mood: "Характер", shop: "Шопинг", drive: "Авто", time: "Сборы", meme: "Мемы" };
-        lines.forEach(function (row) {
-          if (titles[row.title]) row.title = titles[row.title];
-        });
-
-        els.form.querySelectorAll('input[name="bonus"]:checked').forEach(function (el) {
-          add("Бонус", Number(el.value), el.getAttribute("data-label"), true);
-        });
-
-        var raw = 50 + sum;
-        var rams = Math.max(-20, Math.min(250, raw));
-        return { name: name, age: age, lines: lines, perks: pickPerks(perks), raw: raw, rams: rams, verdict: verdictOf(rams) };
+        var rams = Math.max(SCORE_MIN, Math.min(SCORE_MAX, sum));
+        return { name: name, lines: lines, perks: pickPerks(lines), raw: sum, rams: rams, verdict: verdictOf(rams) };
       }
 
-      function pickPerks(list) {
-        var funny = list.filter(function (t) {
-          return t && !/потенциал|мудрость|винтаж|Съедобно|скидк|лево и право|котами/i.test(t);
+      function pickPerks(lines) {
+        var spicy = lines.filter(function (row) { return row.pts === 10 || row.pts === 0; });
+        var mid = lines.filter(function (row) { return row.pts === 3; });
+        var pool = spicy.concat(mid).concat(lines);
+        var seen = {};
+        var out = [];
+        pool.forEach(function (row) {
+          if (!row.label || seen[row.label] || out.length >= 3) return;
+          seen[row.label] = true;
+          out.push(row.label);
         });
-        var pool = (funny.length >= 2 ? funny : list).slice();
-        return pool.slice(-3);
+        return out;
       }
 
       function verdictOf(n) {
-        if (n < 0) return "Опасная сделка: отдайте 5 баранов и бегите";
-        if (n <= 40) return "Студенческий тариф: экономно, но с сюрпризами";
-        if (n <= 90) return "Надежный выбор: стандартный восточный комфорт";
-        if (n <= 150) return "Премиум-невеста: шейхи выстраиваются в очередь";
-        return "Легендарный дроп: султан заложил дворец и весь гарем";
+        if (n <= 25) return "Бюджетный стартап: требует доработок и терпения";
+        if (n <= 50) return "Студенческий тариф: экономно, но с огоньком";
+        if (n <= 75) return "Золотой фонд: надежный восточный комфорт";
+        if (n <= 90) return "Премиум-невеста: шейхи занимают очередь с ночи";
+        return "Абсолютный джекпот: султан продал дворец и весь гарем";
       }
 
       function fmtPts(n) {
@@ -714,10 +827,7 @@
 
       function updateLive() {
         var r = collect();
-        els.liveScore.textContent = "~" + r.rams + " 🐑";
-        var a = ageInfo(Number(els.age.value));
-        els.ageMeta.textContent = els.age.value + " · " + fmtPts(a.pts);
-        els.ageHint.textContent = a.hint;
+        els.liveScore.textContent = "~" + r.rams + " 🐑 из " + SCORE_MAX;
       }
 
       function countUp(el, target, duration) {
@@ -822,6 +932,96 @@
         return "№ БАРАН-" + n + "-VIP";
       }
 
+      function botShortUrl() {
+        return String(BOT_CONFIG.url || "").replace(/^https?:\/\//, "");
+      }
+
+      function isAdTelegram() {
+        return AD_CONFIG.type === "telegram";
+      }
+
+      function adContactLabel() {
+        return isAdTelegram() ? AD_CONFIG.telegramUsername : AD_CONFIG.email;
+      }
+
+      function adHref() {
+        if (isAdTelegram()) return AD_CONFIG.telegramUrl;
+        return "mailto:" + AD_CONFIG.email + "?subject=" + encodeURIComponent(AD_CONFIG.subject || "");
+      }
+
+      function setAdSubjectLine(el, telegram) {
+        if (!el) return;
+        if (telegram) {
+          el.textContent = "";
+          el.style.display = "none";
+          el.classList.add("hidden");
+          return;
+        }
+        el.classList.remove("hidden");
+        el.style.display = "";
+        el.textContent = "Тема письма: " + (AD_CONFIG.subject || "");
+      }
+
+      function applyAdBanners() {
+        var href = adHref();
+        var contact = adContactLabel();
+        var line = AD_CONFIG.text + " " + contact;
+        var telegram = isAdTelegram();
+        if (els.adTitle) els.adTitle.textContent = AD_CONFIG.title;
+        if (els.adText) els.adText.textContent = AD_CONFIG.text + " ";
+        if (els.adLink) {
+          els.adLink.href = href;
+          els.adLink.textContent = contact;
+          if (telegram) {
+            els.adLink.setAttribute("target", "_blank");
+            els.adLink.setAttribute("rel", "noopener noreferrer");
+          } else {
+            els.adLink.removeAttribute("target");
+            els.adLink.removeAttribute("rel");
+          }
+        }
+        setAdSubjectLine(els.adSubject, telegram);
+        if (els.stAdTitle) els.stAdTitle.textContent = AD_CONFIG.title;
+        if (els.stAdText) els.stAdText.textContent = line;
+        setAdSubjectLine(els.stAdSubject, telegram);
+        if (els.certAdTitle) els.certAdTitle.textContent = AD_CONFIG.title;
+        if (els.certAdText) els.certAdText.textContent = line;
+        setAdSubjectLine(els.certAdSubject, telegram);
+      }
+
+      function applyBotWatermarks() {
+        var handle = BOT_CONFIG.name;
+        var shortUrl = botShortUrl();
+        if (els.stBotLink) {
+          els.stBotLink.href = BOT_CONFIG.url;
+          els.stBotLink.title = BOT_CONFIG.label;
+          els.stBotLink.textContent = "🤖 Бот: " + handle;
+        }
+        if (els.certBotMark) {
+          els.certBotMark.href = BOT_CONFIG.url;
+          els.certBotMark.title = BOT_CONFIG.label;
+          els.certBotMark.textContent = "Электронная верификация калыма: " + shortUrl + " | Сертификат выдан через " + handle;
+        }
+      }
+
+      function addPdfBotLink(pdf, pageW, pageH) {
+        var mark = els.certBotMark;
+        var card = els.certCard;
+        var x = 8;
+        var y = pageH - 16;
+        var w = pageW - 16;
+        var h = 12;
+        if (mark && card && card.offsetWidth && mark.offsetWidth) {
+          var cardRect = card.getBoundingClientRect();
+          var markRect = mark.getBoundingClientRect();
+          x = (markRect.left - cardRect.left) / card.offsetWidth * pageW;
+          y = (markRect.top - cardRect.top) / card.offsetHeight * pageH;
+          w = markRect.width / card.offsetWidth * pageW;
+          h = markRect.height / card.offsetHeight * pageH;
+        }
+        pdf.link(x, y, w, h, { url: BOT_CONFIG.url });
+      }
+
       function fillExports(r) {
         els.stName.textContent = r.name;
         els.stCount.textContent = String(r.rams);
@@ -830,12 +1030,12 @@
         r.perks.forEach(function (p) {
           var d = document.createElement("div");
           d.textContent = "✦ " + p;
-          d.setAttribute("style", "border:2px solid #a3e635;padding:7px 8px;font-size:12px;font-weight:800;background:#111;color:#bef264;");
+          d.setAttribute("style", "border:2px solid #a3e635;padding:5px 7px;font-size:11px;font-weight:800;background:#111;color:#bef264;");
           els.stPerks.appendChild(d);
         });
 
         els.certName.textContent = r.name;
-        els.certCount.textContent = r.rams + " 🐑";
+        els.certCount.textContent = r.rams + " / " + SCORE_MAX + " 🐑";
         els.certVerdict.textContent = r.verdict;
         els.certSerial.textContent = serialFor();
         els.certDate.textContent = new Date().toLocaleDateString("ru-RU");
@@ -861,23 +1061,22 @@
         fillExports(r);
         els.resultName.textContent = r.name;
         els.resultVerdict.textContent = r.verdict;
-        els.breakdown.innerHTML = '<p class="display mb-2 text-sm font-black">Разбор комиссии</p>' +
-          '<p class="mb-2 text-xs font-bold">База Госкомитета: +50</p>' +
+        els.breakdown.innerHTML = '<p class="display mb-2 text-sm font-black">Разбор комиссии · 10 блоков × 0–10</p>' +
           r.lines.map(function (row) {
-            var cls = row.pts >= 0 ? "text-lime-700 dark:text-lime-300" : "text-fuchsia-700 dark:text-fuchsia-300";
             return '<div class="flex justify-between gap-3 border-b border-zinc-200 py-1.5 text-xs font-extrabold dark:border-zinc-700"><span>' +
-              escapeHtml(row.label) + '</span><span class="' + cls + '">' + fmtPts(row.pts) + "</span></div>";
+              '<span class="text-zinc-500 dark:text-zinc-400">' + escapeHtml(row.title) + " · </span>" +
+              escapeHtml(row.label) + '</span><span class="' + ptsTone(row.pts) + '">' + fmtPts(row.pts) + "</span></div>";
           }).join("") +
-          '<p class="mt-3 text-sm font-black">Итого: ' + r.rams + " 🐑 <span class='text-zinc-500'>(сырой счёт " + r.raw + ")</span></p>";
+          '<p class="mt-3 text-sm font-black">Итого: ' + r.rams + " / " + SCORE_MAX + " 🐑</p>";
 
         showResult();
+        AdTracker.track("banner_views");
         countUp(els.resultCount, r.rams);
         haptic("impact", "heavy");
-        if (r.rams < 0) haptic("notify", "error");
-        else if (r.rams < 40) haptic("notify", "warning");
+        if (r.rams <= 40) haptic("notify", "warning");
         else haptic("notify", "success");
         audio.onResult(r.rams);
-        if (r.rams > 100) setTimeout(fireConfetti, 200);
+        if (r.rams >= 76) setTimeout(fireConfetti, 200);
       }
 
       function escapeHtml(s) {
@@ -886,23 +1085,102 @@
         });
       }
 
-      var AD_MAIL = "mailto:irabotaros@gmail.com?subject=" + encodeURIComponent("Реклама в calc_bee");
+      function copyTextFallback(text) {
+        var ta = document.createElement("textarea");
+        ta.value = text;
+        ta.setAttribute("readonly", "");
+        ta.style.position = "fixed";
+        ta.style.left = "-9999px";
+        document.body.appendChild(ta);
+        ta.focus();
+        ta.select();
+        ta.setSelectionRange(0, text.length);
+        var ok = false;
+        try { ok = document.execCommand("copy"); } catch (e) { ok = false; }
+        ta.remove();
+        if (!ok) throw new Error("copy failed");
+      }
 
-      function openAdMail(ev) {
-        if (ev) ev.preventDefault();
-        haptic("impact", "light");
-        if (tg && typeof tg.openLink === "function") {
-          try {
-            tg.openLink(AD_MAIL);
-            return;
-          } catch (e) {}
+      function setAdCopyIdle() {
+        if (!els.adCopyBtn) return;
+        els.adCopyBtn.classList.remove("is-copied");
+        els.adCopyBtn.disabled = false;
+        if (els.adCopyIcon) els.adCopyIcon.textContent = "📋";
+        if (els.adCopyLabel) els.adCopyLabel.textContent = "Скопировать";
+      }
+
+      function setAdCopyDone() {
+        if (!els.adCopyBtn) return;
+        els.adCopyBtn.classList.remove("is-copied");
+        void els.adCopyBtn.offsetWidth;
+        els.adCopyBtn.classList.add("is-copied");
+        els.adCopyBtn.disabled = true;
+        if (els.adCopyIcon) els.adCopyIcon.textContent = "✅";
+        if (els.adCopyLabel) els.adCopyLabel.textContent = "Скопировано!";
+      }
+
+      function copyAdContact(ev) {
+        if (ev) {
+          ev.preventDefault();
+          ev.stopPropagation();
         }
-        window.location.href = AD_MAIL;
+        if (els.adCopyBtn && els.adCopyBtn.disabled) return;
+        var contact = adContactLabel();
+        if (!contact) return;
+        AdTracker.track("copy_clicks");
+
+        function copied() {
+          haptic("notify", "success");
+          audio.click();
+          toast("Контакт скопирован в буфер 📋");
+          setAdCopyDone();
+          clearTimeout(copyAdContact._t);
+          copyAdContact._t = setTimeout(setAdCopyIdle, 2000);
+        }
+
+        function failed() {
+          haptic("notify", "error");
+          toast("Не вышло скопировать. Выдели контакт вручную");
+          setAdCopyIdle();
+        }
+
+        var write = navigator.clipboard && typeof navigator.clipboard.writeText === "function"
+          ? navigator.clipboard.writeText(contact)
+          : Promise.reject();
+        write.then(copied).catch(function () {
+          try {
+            copyTextFallback(contact);
+            copied();
+          } catch (e) {
+            failed();
+          }
+        });
+      }
+
+      function openAdLink(ev) {
+        if (ev) ev.preventDefault();
+        AdTracker.track("contact_clicks");
+        haptic("impact", "light");
+        var href = adHref();
+        if (isAdTelegram()) {
+          if (tg && typeof tg.openTelegramLink === "function") {
+            try { tg.openTelegramLink(href); return; } catch (e) {}
+          }
+          if (tg && typeof tg.openLink === "function") {
+            try { tg.openLink(href); return; } catch (e) {}
+          }
+          window.open(href, "_blank");
+          return;
+        }
+        if (tg && typeof tg.openLink === "function") {
+          try { tg.openLink(href); return; } catch (e) {}
+        }
+        window.location.href = href;
       }
 
       function shareResult() {
         var r = lastResult || collect();
-        var text = "🐑 Официальный калым-рейтинг\n" + r.name + ": " + r.rams + " баранов\n" + r.verdict + "\nРассчитай свой:";
+        var text = "🐑 Официальный калым-рейтинг\n" + r.name + ": " + r.rams + " / " + SCORE_MAX + " баранов\n" + r.verdict + "\nРассчитай свой:";
         var page = window.location.href.split("#")[0];
         var url = "https://t.me/share/url?url=" + encodeURIComponent(page) + "&text=" + encodeURIComponent(text);
         if (tg && typeof tg.openTelegramLink === "function") {
@@ -949,6 +1227,7 @@
 
       async function exportStories() {
         if (!lastResult) return;
+        AdTracker.track("export_impressions");
         toast("Рендерим Stories 9:16…");
         try {
           var canvas = await capture(els.storiesCard, { scale: 3, width: 360, height: 640, backgroundColor: "#09090b" });
@@ -963,6 +1242,7 @@
 
       async function exportCertPng() {
         if (!lastResult) return;
+        AdTracker.track("export_impressions");
         toast("Печатаем сертификат…");
         try {
           var canvas = await capture(els.certCard, { scale: 2, width: 1123, height: 794, backgroundColor: "#fff8e7" });
@@ -977,6 +1257,7 @@
 
       async function exportCertPdf() {
         if (!lastResult) return;
+        AdTracker.track("export_impressions");
         toast("Сшиваем PDF…");
         try {
           var canvas = await capture(els.certCard, { scale: 2, width: 1123, height: 794, backgroundColor: "#fff8e7" });
@@ -987,6 +1268,7 @@
           var w = pdf.internal.pageSize.getWidth();
           var h = pdf.internal.pageSize.getHeight();
           pdf.addImage(img, "PNG", 0, 0, w, h);
+          addPdfBotLink(pdf, w, h);
           pdf.save("kalym-cert-" + slug(lastResult.name) + ".pdf");
           toast("PDF ускакал в загрузки 📄");
         } catch (e) {
@@ -1003,7 +1285,6 @@
           }
           updateLive();
         });
-        els.age.addEventListener("input", updateLive);
         els.name.addEventListener("input", function () {
           setMainButton();
           updateLive();
@@ -1062,11 +1343,29 @@
         audio.click();
       });
 
-      document.getElementById("adMail").addEventListener("click", openAdMail);
+      if (els.adLink) els.adLink.addEventListener("click", openAdLink);
+      if (els.adCopyBtn) els.adCopyBtn.addEventListener("click", copyAdContact);
+      if (els.adBanner) {
+        els.adBanner.addEventListener("click", function (ev) {
+          if (ev.target.closest("a, button")) return;
+          openAdLink(ev);
+        });
+      }
 
-      els.storiesBtn.addEventListener("click", exportStories);
-      els.certPngBtn.addEventListener("click", exportCertPng);
-      els.certPdfBtn.addEventListener("click", exportCertPdf);
+      function runExport() {
+        haptic("impact", "light");
+        audio.click();
+        var fmt = els.exportFormat && els.exportFormat.value;
+        if (fmt === "stories") return exportStories();
+        if (fmt === "cert-png") return exportCertPng();
+        if (fmt === "cert-pdf") return exportCertPdf();
+      }
+
+      els.exportFormat.addEventListener("change", function () {
+        haptic("impact", "light");
+        audio.click();
+      });
+      els.exportBtn.addEventListener("click", runExport);
       els.shareBtn.addEventListener("click", shareResult);
       els.againBtn.addEventListener("click", showForm);
       els.closePreview.addEventListener("click", closePreview);
@@ -1076,9 +1375,20 @@
 
       updateSoundBtn();
       syncThemeFromTelegram();
+      applyAdBanners();
+      applyBotWatermarks();
+      AdTracker.track("banner_views");
+      renderQuestionBlocks();
       bindInputs();
       initTelegram();
       updateLive();
+
+      window.addEventListener("pagehide", function () {
+        AdTracker.flushTelegram();
+      });
+      document.addEventListener("visibilitychange", function () {
+        if (document.visibilityState === "hidden") AdTracker.flushTelegram();
+      });
     })();
   </script>
 </body>
