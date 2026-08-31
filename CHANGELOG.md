@@ -1,5 +1,15 @@
 # Журнал изменений (Changelog)
 
+## [1.6.1] - 2026-08-31
+
+### Export
+- [fix]: Плашка `#stScale` (`/ 100 🐑`) в Stories выровнена по базовой линии крупного счёта: `#stScoreRow` переведён на `align-items: flex-end` с `gap: 10px`, у `#stCount` `line-height: 0.9`, у плашки `margin-bottom: 4px`, чтобы бейдж не висел выше цифр 0 / 79 / 100. Файлы: index.html.
+
+## [1.6.0] - 2026-08-31
+
+### Export
+- [feat]: Stories `#storiesCard` / `#stPanel` и сертификат `#certInner` получают тематические геометрические водяные знаки на 10 рангов `CERT_TIERS`: CSS-градиенты (caution, craft fibers, blueprint, dot matrix, шеврон, дамаск, tech-сетка, pinstripe, sunburst) плюс inline Data-URI SVG (штрих-код, ключи/коробки, чертежи, колосья, ромбы ГОСТ, изометрические кубы, соты, арабеска, дворцовая мозаика). Слои `#stWallpaper`, `#stPattern`, `#certPattern` стоят под текстом (`pointer-events: none`, `z-index: 0`, opacity 0.09–0.14), без внешних HTTP — html2canvas не ловит CORS. Файлы: index.html, README.md.
+
 ## [1.5.6] - 2026-08-31
 
 ### Export
