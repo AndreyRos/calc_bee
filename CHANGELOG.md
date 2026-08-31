@@ -1,5 +1,10 @@
 # Журнал изменений (Changelog)
 
+## [1.8.0] - 2026-08-31
+
+### Share
+- [feat]: Кнопка «Поделиться» собирает вирусный текст (`А сколько барашек дадут за тебя? Нажми и узнай 👇` + `https://t.me/calc_kalym_bot/app`) и карточку с картинкой `mainpic.jpg`: `t.me/share/url` ведёт на `share.html` с Open Graph (`og:image`), страница сразу редиректит в Mini App. Файлы: index.html, share.html, README.md.
+
 ## [1.7.3] - 2026-08-31
 
 ### Share
