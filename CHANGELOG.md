@@ -1,5 +1,10 @@
 # Журнал изменений (Changelog)
 
+## [1.7.0] - 2026-08-31
+
+### Monetization
+- [feat]: Подключена сеть Adsgram (`sad.min.js` в `<head>`). Модуль `AdController` инициализирует `window.Adsgram.init({ blockId, debug: false })`, `showRewarded()` резолвит просмотр и реджектит пропуск/ошибку, а при отсутствии SDK или плейсхолдере `YOUR_ADSGRAM_BLOCK_ID` не ломает флоу и резолвит Promise. Экспорт Stories/PNG/PDF (`runExport`) ждёт rewarded-ролик, перед показом toast «Загрузка рекламного видео... 🎬»; `AdTracker` считает `rewarded_shows` (`onStart`) и `rewarded_completions` (`onReward`). Файлы: index.html, README.md.
+
 ## [1.6.3] - 2026-08-31
 
 ### Export

@@ -7,6 +7,7 @@
   <meta name="color-scheme" content="dark light" />
   <title>Калькулятор калыма 🐑</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
   <script>
     (function () {
       var tw = window.Telegram && window.Telegram.WebApp;
@@ -914,6 +915,8 @@
             contact_clicks: 0,
             copy_clicks: 0,
             export_impressions: 0,
+            rewarded_shows: 0,
+            rewarded_completions: 0,
             last_interaction: null
           };
         },
@@ -957,6 +960,52 @@
             tg.sendData(JSON.stringify(payload));
             this.flushed = true;
           } catch (e) {}
+        }
+      };
+
+      var AdController = {
+        BLOCK_ID: "YOUR_ADSGRAM_BLOCK_ID",
+        sdk: null,
+        bound: false,
+        isConfigured: function () {
+          var id = String(this.BLOCK_ID || "").trim();
+          return !!id && id !== "YOUR_ADSGRAM_BLOCK_ID";
+        },
+        init: function () {
+          if (this.sdk) return this.sdk;
+          if (!this.isConfigured()) return null;
+          if (!window.Adsgram || typeof window.Adsgram.init !== "function") return null;
+          try {
+            this.sdk = window.Adsgram.init({ blockId: this.BLOCK_ID, debug: false });
+            if (this.sdk && typeof this.sdk.addEventListener === "function" && !this.bound) {
+              this.sdk.addEventListener("onStart", function () {
+                AdTracker.track("rewarded_shows");
+              });
+              this.sdk.addEventListener("onReward", function () {
+                AdTracker.track("rewarded_completions");
+              });
+              this.bound = true;
+            }
+            return this.sdk;
+          } catch (e) {
+            this.sdk = null;
+            return null;
+          }
+        },
+        showRewarded: function () {
+          var self = this;
+          return new Promise(function (resolve, reject) {
+            var ctrl = self.init();
+            if (!ctrl || typeof ctrl.show !== "function") {
+              resolve({ skipped: true, reason: "unavailable" });
+              return;
+            }
+            try {
+              ctrl.show().then(resolve).catch(reject);
+            } catch (e) {
+              resolve({ skipped: true, reason: "error" });
+            }
+          });
         }
       };
 
@@ -1964,12 +2013,22 @@
       }
 
       function runExport() {
+        if (runExport._busy) return;
         haptic("impact", "light");
         audio.click();
+        if (!lastResult) return;
         var fmt = els.exportFormat && els.exportFormat.value;
-        if (fmt === "stories") return exportStories();
-        if (fmt === "cert-png") return exportCertPng();
-        if (fmt === "cert-pdf") return exportCertPdf();
+        runExport._busy = true;
+        toast("Загрузка рекламного видео... 🎬");
+        return AdController.showRewarded().then(function () {
+          if (fmt === "stories") return exportStories();
+          if (fmt === "cert-png") return exportCertPng();
+          if (fmt === "cert-pdf") return exportCertPdf();
+        }).catch(function () {
+          toast("Реклама пропущена. Экспорт откроется после просмотра");
+        }).then(function () {
+          runExport._busy = false;
+        });
       }
 
       els.exportFormat.addEventListener("change", function () {
@@ -1988,6 +2047,7 @@
       syncThemeFromTelegram();
       applyAdBanners();
       applyBotWatermarks();
+      AdController.init();
       AdTracker.track("banner_views");
       renderQuestionBlocks();
       bindInputs();
