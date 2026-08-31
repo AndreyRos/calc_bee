@@ -1,5 +1,10 @@
 # Журнал изменений (Changelog)
 
+## [1.7.1] - 2026-08-31
+
+### Export
+- [fix]: Плашка `#stScale` (`/ 100 🐑`) больше не режет текст и эмодзи: `min-width: 124px`, `min-height: 32px`, `padding: 8px 20px`, `overflow: visible`; цифры и барашек разведены по `inline-flex` со слотом 18px под 🐑; строка `#stScoreRow` выровнена по центру крупного счёта. Файлы: index.html.
+
 ## [1.7.0] - 2026-08-31
 
 ### Monetization

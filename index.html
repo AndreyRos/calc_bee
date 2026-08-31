@@ -192,6 +192,25 @@
       justify-content: space-between;
       height: 100%;
     }
+    #stScoreRow {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    #stScale {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: auto;
+      min-width: 124px;
+      max-width: none;
+      min-height: 32px;
+      padding: 8px 20px;
+      white-space: nowrap;
+      line-height: 1;
+      overflow: visible;
+      box-sizing: border-box;
+    }
     #stStamp,
     #certStamp {
       position: relative;
@@ -347,9 +366,9 @@
           <div id="stBadge" style="display:flex;align-items:center;justify-content:center;gap:6px;border:3px solid #a3e635;background:#a3e635;color:#000;padding:7px 8px;font-weight:900;font-size:12px;letter-spacing:.04em;text-align:center;line-height:1;overflow:visible;box-sizing:border-box;">ОФИЦИАЛЬНЫЙ КАЛЫМ-РЕЙТИНГ <span style="font-size:28px;line-height:1;">🐑</span></div>
           <p id="stName" style="margin:10px 0 0;font-size:20px;font-weight:900;line-height:1.15;word-break:break-word;color:#fafafa;"></p>
           <p id="stLabel" style="margin:8px 0 0;font-size:11px;font-weight:800;color:#fafafa;letter-spacing:.08em;opacity:0.9;">БАРАНОВ К ВЫКУПУ</p>
-          <div id="stScoreRow" style="display:flex;align-items:baseline;gap:10px;margin-top:6px;">
+          <div id="stScoreRow" style="display:flex;align-items:center;gap:10px;margin-top:6px;">
             <p id="stCount" style="margin:0;font-size:56px;line-height:0.9;font-weight:900;color:#fafafa;flex-shrink:0;">0</p>
-            <p id="stScale" style="margin:0;width:auto;max-width:fit-content;white-space:nowrap;padding:4px 10px;display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;line-height:1;color:#0a0a0a;background:#fde047;border:2px solid #0a0a0a;box-sizing:border-box;flex-shrink:0;">/ 100 🐑</p>
+            <p id="stScale" style="margin:0;width:auto;min-width:124px;max-width:none;min-height:32px;white-space:nowrap;padding:8px 20px;display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;line-height:1;color:#0a0a0a;background:#fde047;border:2px solid #0a0a0a;box-sizing:border-box;overflow:visible;flex-shrink:0;"><span style="display:inline-flex;align-items:center;gap:6px;line-height:1;"><span>/ 100</span><span aria-hidden="true" style="font-size:13px;line-height:1;display:inline-flex;align-items:center;justify-content:center;width:18px;flex-shrink:0;">🐑</span></span></p>
           </div>
         </div>
         <div id="stMid" style="display:flex;align-items:flex-start;gap:12px;flex:1;min-height:0;margin:10px 0;">
@@ -1641,9 +1660,14 @@
           els.stScale.style.alignItems = "center";
           els.stScale.style.justifyContent = "center";
           els.stScale.style.width = "auto";
-          els.stScale.style.maxWidth = "fit-content";
+          els.stScale.style.minWidth = "124px";
+          els.stScale.style.maxWidth = "none";
+          els.stScale.style.minHeight = "32px";
           els.stScale.style.whiteSpace = "nowrap";
-          els.stScale.style.padding = "4px 10px";
+          els.stScale.style.padding = "8px 20px";
+          els.stScale.style.lineHeight = "1";
+          els.stScale.style.overflow = "visible";
+          els.stScale.style.boxSizing = "border-box";
           els.stScale.style.background = "#fde047";
           els.stScale.style.borderColor = "#0a0a0a";
           els.stScale.style.color = "#0a0a0a";

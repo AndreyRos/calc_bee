@@ -1,0 +1,28 @@
+---
+description: Архитектура calc_bee и ограничения фронтенда
+alwaysApply: true
+---
+
+# Архитектура calc_bee
+
+Telegram Mini App «Калькулятор калыма». SPA без тяжёлых фреймворков.
+
+## Файлы
+- `index.html` — единственная точка входа (HTML5, Tailwind CDN, Vanilla JS, Telegram SDK, Web Audio, html2canvas, jsPDF, canvas-confetti)
+- `README.md` — спецификация и деплой
+- `CHANGELOG.md` — SemVer-журнал
+- `.cursorrules` и `.cursor/rules/` — правила разработки
+
+## Нельзя
+- Не вводить Vite/Webpack/React без прямой просьбы пользователя
+- Не ломать Neubrutalism и Dark/Light (`darkMode: 'class'`)
+- Внешние библиотеки — только надёжные CDN
+- При изменении UI/логики проверять Telegram WebApp: `ready`, `expand`, `HapticFeedback`, `MainButton`, `BackButton`
+
+```html
+<!-- ❌ BAD: локальный бандл -->
+<script src="/dist/app.js"></script>
+
+<!-- ✅ GOOD: CDN -->
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+```
