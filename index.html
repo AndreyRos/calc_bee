@@ -7,7 +7,7 @@
   <meta name="color-scheme" content="dark light" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
-  <meta name="app-version" content="1.8.1" />
+  <meta name="app-version" content="1.8.2" />
   <title>Калькулятор калыма 🐑</title>
   <meta name="description" content="Шуточный рейтинг выкупа в баранах" />
   <meta property="og:type" content="website" />
@@ -364,9 +364,10 @@
 
   <div id="previewModal" class="fixed inset-0 z-40 hidden items-center justify-center bg-black/70 p-4">
     <div class="brutal max-h-[90vh] w-full max-w-sm overflow-auto bg-white p-3 dark:bg-zinc-900">
-      <p class="display mb-2 text-sm font-black">Превью · зажми, чтобы сохранить</p>
+      <p id="previewTitle" class="display mb-2 text-sm font-black">Превью</p>
       <img id="previewImg" alt="Превью экспорта" class="w-full border-2 border-black dark:border-white" />
-      <button id="closePreview" type="button" class="brutal brutal-press mt-3 w-full bg-lime-400 py-2 text-sm font-black text-black">Закрыть</button>
+      <button id="savePreview" type="button" class="brutal brutal-press mt-3 w-full bg-lime-400 py-3 text-sm font-black text-black">Сохранить</button>
+      <button id="closePreview" type="button" class="brutal brutal-press mt-2 w-full bg-white py-2 text-sm font-black text-black dark:bg-zinc-800 dark:text-white">Закрыть</button>
     </div>
   </div>
 
@@ -1072,7 +1073,9 @@
         againBtn: document.getElementById("againBtn"),
         toast: document.getElementById("toast"),
         previewModal: document.getElementById("previewModal"),
+        previewTitle: document.getElementById("previewTitle"),
         previewImg: document.getElementById("previewImg"),
+        savePreview: document.getElementById("savePreview"),
         closePreview: document.getElementById("closePreview"),
         storiesCard: document.getElementById("storiesCard"),
         certCard: document.getElementById("certCard"),
@@ -1901,6 +1904,8 @@
         window.open(url, "_blank");
       }
 
+      var previewState = { dataUrl: "", filename: "", blob: null };
+
       function downloadDataUrl(dataUrl, filename) {
         var a = document.createElement("a");
         a.href = dataUrl;
@@ -1908,6 +1913,17 @@
         document.body.appendChild(a);
         a.click();
         a.remove();
+      }
+
+      function downloadBlob(blob, filename) {
+        var href = URL.createObjectURL(blob);
+        var a = document.createElement("a");
+        a.href = href;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(function () { URL.revokeObjectURL(href); }, 2000);
       }
 
       function slug(name) {
@@ -1923,8 +1939,16 @@
         }, opts || {}));
       }
 
-      function openPreview(dataUrl) {
+      function openPreview(dataUrl, filename, blob) {
+        previewState.dataUrl = dataUrl || "";
+        previewState.filename = filename || "kalym.png";
+        previewState.blob = blob || null;
         els.previewImg.src = dataUrl;
+        if (els.previewTitle) {
+          els.previewTitle.textContent = /\.pdf$/i.test(previewState.filename)
+            ? "Превью сертификата"
+            : "Превью";
+        }
         els.previewModal.classList.remove("hidden");
         els.previewModal.classList.add("flex");
       }
@@ -1934,6 +1958,44 @@
         els.previewModal.classList.remove("flex");
       }
 
+      function savePreview() {
+        haptic("impact", "medium");
+        audio.click();
+        var filename = previewState.filename || "kalym.png";
+        var dataUrl = previewState.dataUrl;
+        function finish(fileBlob) {
+          if (fileBlob && navigator.share && typeof navigator.canShare === "function") {
+            try {
+              var file = new File([fileBlob], filename, { type: fileBlob.type || "image/png" });
+              if (navigator.canShare({ files: [file] })) {
+                navigator.share({ files: [file], title: filename }).then(function () {
+                  toast("Сохранено");
+                }).catch(function () {
+                  downloadBlob(fileBlob, filename);
+                  toast("Файл ушёл в загрузки");
+                });
+                return;
+              }
+            } catch (e) {}
+          }
+          if (fileBlob) downloadBlob(fileBlob, filename);
+          else if (dataUrl) downloadDataUrl(dataUrl, filename);
+          toast("Файл ушёл в загрузки");
+        }
+        if (previewState.blob) {
+          finish(previewState.blob);
+          return;
+        }
+        if (!dataUrl) {
+          toast("Сначала экспортируй результат");
+          return;
+        }
+        fetch(dataUrl).then(function (res) { return res.blob(); }).then(finish).catch(function () {
+          downloadDataUrl(dataUrl, filename);
+          toast("Файл ушёл в загрузки");
+        });
+      }
+
       async function exportStories() {
         if (!lastResult) return;
         AdTracker.track("export_impressions");
@@ -1941,8 +2003,8 @@
         try {
           var canvas = await capture(els.storiesCard, { scale: 3, width: 360, height: 640, backgroundColor: "#09090b" });
           var url = canvas.toDataURL("image/png");
-          downloadDataUrl(url, "kalym-stories-" + slug(lastResult.name) + ".png");
-          openPreview(url);
+          var filename = "kalym-stories-" + slug(lastResult.name) + ".png";
+          openPreview(url, filename);
           toast("Stories готовы 📱");
         } catch (e) {
           toast("Не вышло снять Stories. Попробуй ещё раз");
@@ -1956,8 +2018,8 @@
         try {
           var canvas = await capture(els.certCard, { scale: 2, width: 1123, height: 794, backgroundColor: "#fff8e7" });
           var url = canvas.toDataURL("image/png");
-          downloadDataUrl(url, "kalym-cert-" + slug(lastResult.name) + ".png");
-          openPreview(url);
+          var filename = "kalym-cert-" + slug(lastResult.name) + ".png";
+          openPreview(url, filename);
           toast("Сертификат готов 📜");
         } catch (e) {
           toast("Сертификат не распечатался. Ещё раз?");
@@ -1978,8 +2040,10 @@
           var h = pdf.internal.pageSize.getHeight();
           pdf.addImage(img, "PNG", 0, 0, w, h);
           addPdfBotLink(pdf, w, h);
-          pdf.save("kalym-cert-" + slug(lastResult.name) + ".pdf");
-          toast("PDF ускакал в загрузки 📄");
+          var filename = "kalym-cert-" + slug(lastResult.name) + ".pdf";
+          var blob = pdf.output("blob");
+          openPreview(img, filename, blob);
+          toast("PDF готов 📄");
         } catch (e) {
           toast("PDF не собрался. Попробуй PNG");
         }
@@ -2087,6 +2151,7 @@
       els.exportBtn.addEventListener("click", runExport);
       els.shareBtn.addEventListener("click", shareResult);
       els.againBtn.addEventListener("click", showForm);
+      if (els.savePreview) els.savePreview.addEventListener("click", savePreview);
       els.closePreview.addEventListener("click", closePreview);
       els.previewModal.addEventListener("click", function (ev) {
         if (ev.target === els.previewModal) closePreview();

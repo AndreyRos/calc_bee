@@ -1,5 +1,10 @@
 # Журнал изменений (Changelog)
 
+## [1.8.2] - 2026-08-31
+
+### Export
+- [fix]: В модалке превью вместо «зажми, чтобы сохранить» кнопка `#savePreview` «Сохранить»: PNG/Stories и сертификат PDF открывают превью, файл пишется в `previewState` и скачивается по клику (`<a download>` или `navigator.share` с File в Telegram). Файлы: index.html, README.md.
+
 ## [1.8.1] - 2026-08-31
 
 ### Share

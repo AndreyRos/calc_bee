@@ -33,7 +33,7 @@
 - Тактильный отклик: HapticFeedback дает легкую вибрацию на опциях, тяжелую на результате.
 - Модель баллов: 10 радио-блоков, live-счётчик `~N 🐑 из 100`, итог не выходит за [0, 100].
 - Аудиомодуль: Web Audio API Oscillator синтезирует блеяние без блокировок браузера; пороги `onResult` — 0–40 / 41–75 / 76–100.
-- Экспорт: селект формата + кнопка «Экспортировать результат» вызывают html2canvas / jsPDF без смещения шрифтов; ранг `CERT_TIERS` совпадает со шкалой; геометрический watermark ранга рисуется inline (CSS + Data-URI SVG) без CORS; штамп не перекрывает рекламу и водяной знак; ссылка бота кликабельна в PDF.
+- Экспорт: селект формата + кнопка «Экспортировать результат» вызывают html2canvas / jsPDF без смещения шрифтов; в превью есть кнопка «Сохранить»; ранг `CERT_TIERS` совпадает со шкалой; геометрический watermark ранга рисуется inline (CSS + Data-URI SVG) без CORS; штамп не перекрывает рекламу и водяной знак; ссылка бота кликабельна в PDF.
 - Хостинг: GitHub Pages отдает статус 200 по адресу https://andreyros.github.io/calc_bee/
 - Реклама / AdTracker: в консоли есть `[AdTracker] Event: … | Total: …`; в `localStorage` ключ `calc_bee_ad_stats` содержит `banner_views`, `contact_clicks`, `copy_clicks`, `export_impressions`, `rewarded_shows`, `rewarded_completions`, `last_interaction`.
 - Adsgram: в `<head>` загружен `https://sad.adsgram.ai/js/sad.min.js`; `AdController.init()` не падает; экспорт показывает toast «Загрузка рекламного видео... 🎬» и при плейсхолдере `YOUR_ADSGRAM_BLOCK_ID` всё равно генерирует файл.
