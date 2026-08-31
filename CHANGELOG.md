@@ -1,5 +1,15 @@
 # Журнал изменений (Changelog)
 
+## [1.6.3] - 2026-08-31
+
+### Export
+- [fix]: Реклама переведена на `AD_CONFIG.type: "email"` (`irabotaros@gmail.com`, тема «Реклама в calc_bee»): баннер на странице, плашки Stories `#stAdText` и сертификата `#certAdText` показывают email и собирают `mailto:irabotaros@gmail.com?subject=…`, кнопка копирования пишет тот же адрес в буфер. В Stories у `#stBadge` заданы `overflow: visible; box-sizing: border-box`, плашка `#stScale` (`/ 100 🐑`) получила `width: auto; max-width: fit-content; white-space: nowrap; padding: 4px 10px; display: inline-flex`, строка `#stScoreRow` выровнена через `align-items: baseline`. Бот зафиксирован как `@calc_kalym_bot` (`BOT_CONFIG`, кнопка `#stBotLink`). Файлы: index.html, README.md.
+
+## [1.6.2] - 2026-08-31
+
+### Export
+- [fix]: `BOT_CONFIG` переведён на актуальный бот `@calc_kalym_bot` (`https://t.me/calc_kalym_bot`): плашка `#stBotLink` в Stories, строка верификации `#certBotMark` в сертификате и кликабельный `addPdfBotLink` в PDF ведут на новый handle. Файлы: index.html, README.md.
+
 ## [1.6.1] - 2026-08-31
 
 ### Export
