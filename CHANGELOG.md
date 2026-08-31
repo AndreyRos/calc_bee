@@ -1,5 +1,13 @@
 # Журнал изменений (Changelog)
 
+## [1.7.3] - 2026-08-31
+
+### Share
+- [fix]: Шаринг больше не отдаёт GitHub Pages: `shareLink` жёстко `https://t.me/calc_kalym_bot/app`, та же ссылка дублируется в тексте (Telegram подменяет `t.me` в `share/url` на URL Mini App). `BOT_CONFIG.url` и плашки Stories/сертификата ведут в `/app`. Файлы: index.html, README.md.
+
+### Export
+- [fix]: Плашка `#stBotLink` выровнена по центру (`min-height: 36px`, emoji в слоте 18px, `width: 100%`), тень не режется (`padding` футера 4px). Файлы: index.html.
+
 ## [1.7.2] - 2026-08-31
 
 ### Share
