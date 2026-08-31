@@ -1,5 +1,10 @@
 # Журнал изменений (Changelog)
 
+## [1.7.2] - 2026-08-31
+
+### Share
+- [fix]: `shareResult` больше не шарит `window.location.href`: `url` собирается как `t.me/share/url` с прямой ссылкой Mini App (`BOT_CONFIG.url + '/app'` → `https://t.me/calc_kalym_bot/app`) и вирусным текстом (рейтинг Госкомитета, имя, бараны, ранг). Открытие через `tg.openTelegramLink(url)` с фоллбэком на `window.open`. Файлы: index.html, README.md.
+
 ## [1.7.1] - 2026-08-31
 
 ### Export

@@ -1864,16 +1864,16 @@
 
       function shareResult() {
         var r = lastResult || collect();
-        var text = "🐑 Официальный калым-рейтинг\n" + r.name + ": " + r.rams + " / " + SCORE_MAX + " баранов\n" + r.verdict + "\nРассчитай свой:";
-        var page = window.location.href.split("#")[0];
-        var url = "https://t.me/share/url?url=" + encodeURIComponent(page) + "&text=" + encodeURIComponent(text);
+        const shareLink = BOT_CONFIG.url + '/app';
+        const text = `🐑 Официальный калым-рейтинг Госкомитета:\n` +
+          `👰 ${r.name}: ${r.rams} / 100 баранов\n` +
+          `🏆 Ранг: ${r.verdict}\n\n` +
+          `Узнай выкуп за свою невесту 👇`;
+        const url = "https://t.me/share/url?url=" + encodeURIComponent(shareLink) + "&text=" + encodeURIComponent(text);
         if (tg && typeof tg.openTelegramLink === "function") {
-          tg.openTelegramLink(url);
-          return;
+          try { tg.openTelegramLink(url); return; } catch (e) {}
         }
-        var native = "tg://msg_url?url=" + encodeURIComponent(page) + "&text=" + encodeURIComponent(text);
-        window.location.href = native;
-        setTimeout(function () { window.open(url, "_blank"); }, 400);
+        window.open(url, "_blank");
       }
 
       function downloadDataUrl(dataUrl, filename) {
