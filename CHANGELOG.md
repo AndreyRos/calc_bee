@@ -1,5 +1,10 @@
 # Журнал изменений (Changelog)
 
+## [1.8.3] - 2026-09-02
+
+### Share
+- [fix]: `t.me/share/url` больше не подставляет `andreyros.github.io/calc_bee/share.html` первой строкой: параметр `url` — только Mini App `https://t.me/calc_kalym_bot/app`, та же ссылка остаётся в конце вирусного текста. Файлы: index.html, README.md.
+
 ## [1.8.2] - 2026-08-31
 
 ### Export

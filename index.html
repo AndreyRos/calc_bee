@@ -7,7 +7,7 @@
   <meta name="color-scheme" content="dark light" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
-  <meta name="app-version" content="1.8.2" />
+  <meta name="app-version" content="1.8.3" />
   <title>Калькулятор калыма 🐑</title>
   <meta name="description" content="Шуточный рейтинг выкупа в баранах" />
   <meta property="og:type" content="website" />
@@ -1888,13 +1888,12 @@
       function shareResult() {
         var r = lastResult || collect();
         var shareLink = "https://t.me/calc_kalym_bot/app";
-        var previewPage = "https://andreyros.github.io/calc_bee/share.html";
         var text = "🐑 Официальный калым-рейтинг Госкомитета:\n" +
           "👰 " + r.name + ": " + r.rams + " / 100 баранов\n" +
           "🏆 Ранг: " + r.verdict + "\n\n" +
           "А сколько барашек дадут за тебя? Нажми и узнай 👇\n" +
           shareLink;
-        var url = "https://t.me/share/url?url=" + encodeURIComponent(previewPage) + "&text=" + encodeURIComponent(text);
+        var url = "https://t.me/share/url?url=" + encodeURIComponent(shareLink) + "&text=" + encodeURIComponent(text);
         if (tg && typeof tg.openTelegramLink === "function") {
           try { tg.openTelegramLink(url); return; } catch (e) {}
         }
