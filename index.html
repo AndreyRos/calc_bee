@@ -366,6 +366,7 @@
     <div class="brutal max-h-[90vh] w-full max-w-sm overflow-auto bg-white p-3 dark:bg-zinc-900">
       <p id="previewTitle" class="display mb-2 text-sm font-black">Превью</p>
       <img id="previewImg" alt="Превью экспорта" class="w-full border-2 border-black dark:border-white" />
+      <p id="previewHint" class="mt-2 text-center text-xs font-bold leading-snug text-zinc-600 dark:text-zinc-400">💡 Зажми картинку, чтобы сохранить в галерею</p>
       <button id="savePreview" type="button" class="brutal brutal-press mt-3 w-full bg-lime-400 py-3 text-sm font-black text-black">Сохранить</button>
       <button id="closePreview" type="button" class="brutal brutal-press mt-2 w-full bg-white py-2 text-sm font-black text-black dark:bg-zinc-800 dark:text-white">Закрыть</button>
     </div>
@@ -1905,6 +1906,25 @@
 
       var previewState = { dataUrl: "", filename: "", blob: null };
 
+      var EXPORT_BTN_LABEL = "📥 Экспортировать результат";
+      var EXPORT_BTN_LOADING = '<span class="inline-flex items-center gap-2 justify-center"><span class="sheep-bounce inline-block text-lg">🐑</span><span>Печатаем сертификат...</span></span>';
+
+      function setExportButtonLoading(on) {
+        var btn = els.exportBtn;
+        if (!btn) return;
+        if (on) {
+          btn.disabled = true;
+          btn.style.opacity = "0.85";
+          btn.style.cursor = "wait";
+          btn.innerHTML = EXPORT_BTN_LOADING;
+        } else {
+          btn.disabled = false;
+          btn.style.opacity = "";
+          btn.style.cursor = "";
+          btn.innerHTML = EXPORT_BTN_LABEL;
+        }
+      }
+
       function downloadDataUrl(dataUrl, filename) {
         var a = document.createElement("a");
         a.href = dataUrl;
@@ -1930,12 +1950,39 @@
       }
 
       function capture(el, opts) {
-        return html2canvas(el, Object.assign({
-          scale: 2,
-          useCORS: true,
-          backgroundColor: null,
-          logging: false
-        }, opts || {}));
+        var prevPos = el.style.position;
+        var prevLeft = el.style.left;
+        var prevTop = el.style.top;
+        var prevZ = el.style.zIndex;
+        el.style.position = "fixed";
+        el.style.top = "0px";
+        el.style.left = "0px";
+        el.style.zIndex = "-9999";
+        el.style.visibility = "visible";
+
+        var restore = function () {
+          el.style.position = prevPos;
+          el.style.left = prevLeft;
+          el.style.top = prevTop;
+          el.style.zIndex = prevZ;
+        };
+
+        try {
+          return html2canvas(el, Object.assign({
+            scale: 2,
+            x: 0,
+            y: 0,
+            scrollX: 0,
+            scrollY: 0,
+            useCORS: true,
+            allowTaint: true,
+            backgroundColor: null,
+            logging: false
+          }, opts || {})).finally(restore);
+        } catch (e) {
+          restore();
+          return Promise.reject(e);
+        }
       }
 
       function openPreview(dataUrl, filename, blob) {
@@ -1962,24 +2009,28 @@
         audio.click();
         var filename = previewState.filename || "kalym.png";
         var dataUrl = previewState.dataUrl;
+        function fallback(fileBlob) {
+          if (fileBlob) downloadBlob(fileBlob, filename);
+          else if (dataUrl) downloadDataUrl(dataUrl, filename);
+          toast("Файл ушёл в загрузки");
+        }
         function finish(fileBlob) {
-          if (fileBlob && navigator.share && typeof navigator.canShare === "function") {
+          if (fileBlob && typeof navigator.share === "function") {
             try {
               var file = new File([fileBlob], filename, { type: fileBlob.type || "image/png" });
-              if (navigator.canShare({ files: [file] })) {
-                navigator.share({ files: [file], title: filename }).then(function () {
+              var payload = { files: [file], title: filename };
+              var can = typeof navigator.canShare !== "function" || navigator.canShare(payload);
+              if (can) {
+                navigator.share(payload).then(function () {
                   toast("Сохранено");
                 }).catch(function () {
-                  downloadBlob(fileBlob, filename);
-                  toast("Файл ушёл в загрузки");
+                  fallback(fileBlob);
                 });
                 return;
               }
             } catch (e) {}
           }
-          if (fileBlob) downloadBlob(fileBlob, filename);
-          else if (dataUrl) downloadDataUrl(dataUrl, filename);
-          toast("Файл ушёл в загрузки");
+          fallback(fileBlob);
         }
         if (previewState.blob) {
           finish(previewState.blob);
@@ -1999,53 +2050,41 @@
         if (!lastResult) return;
         AdTracker.track("export_impressions");
         toast("Рендерим Stories 9:16…");
-        try {
-          var canvas = await capture(els.storiesCard, { scale: 3, width: 360, height: 640, backgroundColor: "#09090b" });
-          var url = canvas.toDataURL("image/png");
-          var filename = "kalym-stories-" + slug(lastResult.name) + ".png";
-          openPreview(url, filename);
-          toast("Stories готовы 📱");
-        } catch (e) {
-          toast("Не вышло снять Stories. Попробуй ещё раз");
-        }
+        var canvas = await capture(els.storiesCard, { scale: 3, width: 360, height: 640, backgroundColor: "#09090b" });
+        var url = canvas.toDataURL("image/png");
+        var filename = "kalym-stories-" + slug(lastResult.name) + ".png";
+        openPreview(url, filename);
+        toast("Stories готовы 📱");
       }
 
       async function exportCertPng() {
         if (!lastResult) return;
         AdTracker.track("export_impressions");
         toast("Печатаем сертификат…");
-        try {
-          var canvas = await capture(els.certCard, { scale: 2, width: 1123, height: 794, backgroundColor: "#fff8e7" });
-          var url = canvas.toDataURL("image/png");
-          var filename = "kalym-cert-" + slug(lastResult.name) + ".png";
-          openPreview(url, filename);
-          toast("Сертификат готов 📜");
-        } catch (e) {
-          toast("Сертификат не распечатался. Ещё раз?");
-        }
+        var canvas = await capture(els.certCard, { scale: 2, width: 1123, height: 794, backgroundColor: "#fff8e7" });
+        var url = canvas.toDataURL("image/png");
+        var filename = "kalym-cert-" + slug(lastResult.name) + ".png";
+        openPreview(url, filename);
+        toast("Сертификат готов 📜");
       }
 
       async function exportCertPdf() {
         if (!lastResult) return;
         AdTracker.track("export_impressions");
         toast("Сшиваем PDF…");
-        try {
-          var canvas = await capture(els.certCard, { scale: 2, width: 1123, height: 794, backgroundColor: "#fff8e7" });
-          var img = canvas.toDataURL("image/png");
-          var jsPDF = window.jspdf && window.jspdf.jsPDF;
-          if (!jsPDF) throw new Error("jsPDF missing");
-          var pdf = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
-          var w = pdf.internal.pageSize.getWidth();
-          var h = pdf.internal.pageSize.getHeight();
-          pdf.addImage(img, "PNG", 0, 0, w, h);
-          addPdfBotLink(pdf, w, h);
-          var filename = "kalym-cert-" + slug(lastResult.name) + ".pdf";
-          var blob = pdf.output("blob");
-          openPreview(img, filename, blob);
-          toast("PDF готов 📄");
-        } catch (e) {
-          toast("PDF не собрался. Попробуй PNG");
-        }
+        var canvas = await capture(els.certCard, { scale: 2, width: 1123, height: 794, backgroundColor: "#fff8e7" });
+        var img = canvas.toDataURL("image/png");
+        var jsPDF = window.jspdf && window.jspdf.jsPDF;
+        if (!jsPDF) throw new Error("jsPDF missing");
+        var pdf = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
+        var w = pdf.internal.pageSize.getWidth();
+        var h = pdf.internal.pageSize.getHeight();
+        pdf.addImage(img, "PNG", 0, 0, w, h);
+        addPdfBotLink(pdf, w, h);
+        var filename = "kalym-cert-" + slug(lastResult.name) + ".pdf";
+        var blob = pdf.output("blob");
+        openPreview(img, filename, blob);
+        toast("PDF готов 📄");
       }
 
       function bindInputs() {
@@ -2131,15 +2170,27 @@
         if (!lastResult) return;
         var fmt = els.exportFormat && els.exportFormat.value;
         runExport._busy = true;
-        toast("Загрузка рекламного видео... 🎬");
-        return AdController.showRewarded().then(function () {
+        setExportButtonLoading(true);
+
+        var start;
+        if (AdController.isConfigured()) {
+          toast("Загрузка рекламного видео... 🎬");
+          start = AdController.showRewarded();
+        } else {
+          toast("Генерируем результат... ⏳");
+          start = Promise.resolve();
+        }
+
+        return start.then(function () {
           if (fmt === "stories") return exportStories();
           if (fmt === "cert-png") return exportCertPng();
           if (fmt === "cert-pdf") return exportCertPdf();
-        }).catch(function () {
-          toast("Реклама пропущена. Экспорт откроется после просмотра");
-        }).then(function () {
+        }).catch(function (err) {
+          console.error(err);
+          toast("Ошибка экспорта: " + ((err && err.message) || "попробуйте другой формат"));
+        }).finally(function () {
           runExport._busy = false;
+          setExportButtonLoading(false);
         });
       }
 

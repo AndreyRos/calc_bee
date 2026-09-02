@@ -1,5 +1,10 @@
 # Журнал изменений (Changelog)
 
+## [1.8.4] - 2026-09-02
+
+### Export
+- [fix]: Кнопка `#exportBtn` больше не зависает и не рисует пустой canvas: `runExport` показывает rewarded-тост и вызывает `AdController.showRewarded()` только при `isConfigured() === true`, иначе сразу генерирует файл с тостом «Генерируем результат... ⏳»; флаг `_busy` и спиннер-овечка сбрасываются в `finally`; `capture` временно ставит карточку в `position:fixed; left:0; top:0` с `x/y/scrollX/scrollY: 0`, чтобы html2canvas не рендерил сдвиг `-12000px`; в превью подсказка «зажми картинку» и `navigator.share({ files })` с фоллбэком на `downloadDataUrl` / `downloadBlob`. Файлы: index.html, README.md.
+
 ## [1.8.3] - 2026-09-02
 
 ### Share
