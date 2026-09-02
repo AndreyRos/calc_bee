@@ -7,7 +7,7 @@
   <meta name="color-scheme" content="dark light" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
-  <meta name="app-version" content="1.8.5" />
+  <meta name="app-version" content="1.9.0" />
   <title>Калькулятор калыма 🐑</title>
   <meta name="description" content="Шуточный рейтинг выкупа в баранах" />
   <meta property="og:type" content="website" />
@@ -344,6 +344,7 @@
           </button>
         </div>
         <button id="shareBtn" type="button" class="brutal brutal-press w-full bg-lime-400 py-3 text-sm font-black text-black">Поделиться в Telegram 📤</button>
+        <button id="sendToBotBtn" type="button" class="brutal brutal-press w-full bg-cyan-300 py-3 text-sm font-black text-black">Получить в чат бота 💬</button>
         <button id="againBtn" type="button" class="brutal brutal-press w-full bg-white py-3 text-sm font-black text-black dark:bg-zinc-900 dark:text-white">Пересчитать калым</button>
       </div>
     </section>
@@ -373,9 +374,11 @@
   <div id="previewModal" class="fixed inset-0 z-40 hidden items-center justify-center bg-black/70 p-4">
     <div class="brutal max-h-[90vh] w-full max-w-sm overflow-auto bg-white p-3 dark:bg-zinc-900">
       <p id="previewTitle" class="display mb-2 text-sm font-black">Превью</p>
-      <img id="previewImg" alt="Превью экспорта" class="w-full border-2 border-black dark:border-white" />
-      <p id="previewHint" class="mt-2 text-center text-xs font-bold leading-snug text-zinc-600 dark:text-zinc-400">💡 Зажми картинку, чтобы сохранить в галерею</p>
+      <img id="previewImg" alt="Превью экспорта" title="Зажми картинку для сохранения в галерею" class="w-full border-2 border-black dark:border-white" />
+      <p id="previewHint" class="mt-2 text-center text-xs font-bold leading-snug text-zinc-600 dark:text-zinc-400">💡 Зажми картинку для сохранения в галерею</p>
+      <button id="storyShareBtn" type="button" class="brutal brutal-press mt-3 hidden w-full bg-fuchsia-400 py-3 text-sm font-black text-black">Опубликовать в Stories 📱</button>
       <button id="savePreview" type="button" class="brutal brutal-press mt-3 w-full bg-lime-400 py-3 text-sm font-black text-black">Сохранить</button>
+      <button id="sendToBotPreviewBtn" type="button" class="brutal brutal-press mt-2 w-full bg-cyan-300 py-3 text-sm font-black text-black">Получить в чат бота 💬</button>
       <button id="closePreview" type="button" class="brutal brutal-press mt-2 w-full bg-white py-2 text-sm font-black text-black dark:bg-zinc-800 dark:text-white">Закрыть</button>
     </div>
   </div>
@@ -1079,12 +1082,16 @@
         exportFormat: document.getElementById("exportFormat"),
         exportBtn: document.getElementById("exportBtn"),
         shareBtn: document.getElementById("shareBtn"),
+        sendToBotBtn: document.getElementById("sendToBotBtn"),
         againBtn: document.getElementById("againBtn"),
         toast: document.getElementById("toast"),
         previewModal: document.getElementById("previewModal"),
         previewTitle: document.getElementById("previewTitle"),
         previewImg: document.getElementById("previewImg"),
+        previewHint: document.getElementById("previewHint"),
+        storyShareBtn: document.getElementById("storyShareBtn"),
         savePreview: document.getElementById("savePreview"),
+        sendToBotPreviewBtn: document.getElementById("sendToBotPreviewBtn"),
         closePreview: document.getElementById("closePreview"),
         storiesCard: document.getElementById("storiesCard"),
         certCard: document.getElementById("certCard"),
@@ -1754,6 +1761,7 @@
         els.certCount.textContent = r.rams + " / " + SCORE_MAX + " 🐑";
         els.certVerdict.textContent = r.verdict;
         els.certSerial.textContent = serialFor();
+        r.serial = els.certSerial.textContent;
         els.certDate.textContent = new Date().toLocaleDateString("ru-RU");
         els.certPerks.innerHTML = "";
         r.perks.forEach(function (p) {
@@ -1912,7 +1920,26 @@
         window.open(url, "_blank");
       }
 
-      var previewState = { dataUrl: "", filename: "", blob: null };
+      var previewState = { dataUrl: "", filename: "", blob: null, format: "" };
+      var STORY_MEDIA_FALLBACK = "https://andreyros.github.io/calc_bee/mainpic.jpg";
+
+      function isPublicHttpsUrl(url) {
+        return typeof url === "string" && /^https:\/\//i.test(url);
+      }
+
+      function currentExportFormat() {
+        return (els.exportFormat && els.exportFormat.value) || previewState.format || "stories";
+      }
+
+      function syncPreviewActions(format) {
+        var fmt = format || currentExportFormat();
+        previewState.format = fmt;
+        var showStory = inTelegram && fmt === "stories";
+        if (els.storyShareBtn) {
+          if (showStory) els.storyShareBtn.classList.remove("hidden");
+          else els.storyShareBtn.classList.add("hidden");
+        }
+      }
 
       var EXPORT_BTN_LABEL = "📥 Экспортировать результат";
       var EXPORT_BTN_LOADING = '<span class="inline-flex items-center gap-2 justify-center"><span class="sheep-bounce inline-block text-lg">🐑</span><span>Печатаем сертификат...</span></span>';
@@ -2018,16 +2045,21 @@
         }
       }
 
-      function openPreview(dataUrl, filename, blob) {
+      function openPreview(dataUrl, filename, blob, format) {
         previewState.dataUrl = dataUrl || "";
         previewState.filename = filename || "kalym.png";
         previewState.blob = blob || null;
         els.previewImg.src = dataUrl;
+        els.previewImg.title = "Зажми картинку для сохранения в галерею";
+        if (els.previewHint) {
+          els.previewHint.textContent = "💡 Зажми картинку для сохранения в галерею";
+        }
         if (els.previewTitle) {
           els.previewTitle.textContent = /\.pdf$/i.test(previewState.filename)
             ? "Превью сертификата"
             : "Превью";
         }
+        syncPreviewActions(format || currentExportFormat());
         els.previewModal.classList.remove("hidden");
         els.previewModal.classList.add("flex");
       }
@@ -2051,112 +2083,150 @@
         function hintLongPress() {
           if (els.previewImg) {
             els.previewImg.classList.add("is-save-hint");
+            els.previewImg.title = "Зажми картинку для сохранения в галерею";
             setTimeout(function () {
               if (els.previewImg) els.previewImg.classList.remove("is-save-hint");
-            }, 2000);
+            }, 2200);
           }
-          toast("В Telegram зажми картинку — так она сохранится в галерею");
+          toast("Зажми картинку для сохранения в галерею");
         }
 
-        function tryCopyImage(blob) {
-          if (!blob || String(blob.type || "").indexOf("image/") !== 0) {
-            return Promise.reject(new Error("not-image"));
-          }
-          if (!navigator.clipboard || typeof ClipboardItem === "undefined") {
-            return Promise.reject(new Error("no-clipboard"));
-          }
-          var item = {};
-          item[blob.type] = blob;
-          return navigator.clipboard.write([new ClipboardItem(item)]);
-        }
-
-        function fallback(blob) {
-          if (!inTelegram) {
-            if (blob) downloadBlob(blob, filename);
-            else if (dataUrl) downloadDataUrl(dataUrl, filename);
-            toast("Файл ушёл в загрузки");
+        function fallbackOpen() {
+          hintLongPress();
+          var url = dataUrl;
+          if (!url) return;
+          if (isPublicHttpsUrl(url)) {
+            if (tg && typeof tg.openLink === "function") {
+              try { tg.openLink(url); return; } catch (e) {}
+            }
+            window.open(url, "_blank");
             return;
           }
-          var imageBlob = blob && String(blob.type || "").indexOf("image/") === 0
-            ? blob
-            : dataUrlToBlob(dataUrl);
-          tryCopyImage(imageBlob).then(function () {
-            toast("Картинка скопирована — вставь в чат или сохрани из буфера");
-          }).catch(function () {
-            hintLongPress();
-          });
+          try {
+            var win = window.open(url, "_blank");
+            if (!win && inTelegram) return;
+          } catch (e) {}
         }
 
-        function shareBlob(blob, name) {
-          if (!blob || typeof navigator.share !== "function") {
-            return Promise.reject(new Error("no-share"));
+        function tryNativeDownload() {
+          if (!inTelegram || !tg || typeof tg.downloadFile !== "function") return false;
+          try {
+            tg.downloadFile({ url: dataUrl, file_name: filename }, function (accepted) {
+              if (accepted) toast("Файл сохраняется через Telegram... 📥");
+              else fallbackOpen();
+            });
+            return true;
+          } catch (e) {
+            return false;
           }
+        }
+
+        function canShareFile(blob, name) {
+          if (!blob || typeof navigator.share !== "function") return null;
           try {
             var file = new File([blob], name, { type: blob.type || "image/png" });
             var payload = { files: [file], title: name };
             if (typeof navigator.canShare === "function" && !navigator.canShare(payload)) {
-              return Promise.reject(new Error("cannot-share"));
+              return null;
             }
-            return navigator.share(payload);
+            return payload;
           } catch (e) {
-            return Promise.reject(e);
+            return null;
           }
         }
 
-        function shareOrTimeout(blob, name, ms) {
-          return new Promise(function (resolve, reject) {
-            var done = false;
-            var timer = setTimeout(function () {
-              if (done) return;
-              done = true;
-              reject(new Error("share-timeout"));
-            }, ms);
-            shareBlob(blob, name).then(function () {
-              if (done) return;
-              done = true;
-              clearTimeout(timer);
-              resolve();
-            }).catch(function (err) {
-              if (done) return;
-              done = true;
-              clearTimeout(timer);
-              reject(err);
-            });
-          });
-        }
-
-        toast("Сохраняем…");
-
-        if (!fileBlob) {
-          fallback(null);
-          return;
-        }
+        if (tryNativeDownload()) return;
 
         var platform = (tg && tg.platform) || "";
         var skipShare = inTelegram && (platform === "ios" || platform === "macos");
-        if (skipShare) {
-          fallback(fileBlob);
+        var sharePayload = !skipShare ? canShareFile(fileBlob, filename) : null;
+        if (!sharePayload && !skipShare && fileBlob && fileBlob.type === "application/pdf") {
+          var pngBlob = dataUrlToBlob(dataUrl);
+          var pngName = filename.replace(/\.pdf$/i, ".png");
+          sharePayload = canShareFile(pngBlob, pngName);
+        }
+
+        if (sharePayload) {
+          toast("Сохраняем…");
+          navigator.share(sharePayload).then(function () {
+            toast("Сохранено");
+          }).catch(function (err) {
+            if (err && err.name === "AbortError") return;
+            if (!inTelegram) {
+              if (fileBlob) downloadBlob(fileBlob, filename);
+              else if (dataUrl) downloadDataUrl(dataUrl, filename);
+              toast("Файл ушёл в загрузки");
+              return;
+            }
+            fallbackOpen();
+          });
           return;
         }
 
-        shareOrTimeout(fileBlob, filename, 1600).then(function () {
-          toast("Сохранено");
-        }).catch(function (err) {
-          if (err && err.name === "AbortError") return;
-          if (fileBlob.type === "application/pdf") {
-            var pngBlob = dataUrlToBlob(dataUrl);
-            var pngName = filename.replace(/\.pdf$/i, ".png");
-            if (pngBlob) {
-              return shareOrTimeout(pngBlob, pngName, 1600).then(function () {
-                toast("Сохранено");
-              }).catch(function (pngErr) {
-                if (pngErr && pngErr.name === "AbortError") return;
-                fallback(fileBlob);
-              });
+        if (!inTelegram) {
+          if (fileBlob) downloadBlob(fileBlob, filename);
+          else if (dataUrl) downloadDataUrl(dataUrl, filename);
+          toast("Файл ушёл в загрузки");
+          return;
+        }
+
+        fallbackOpen();
+      }
+
+      function shareToStory() {
+        haptic("impact", "medium");
+        audio.click();
+        if (!tg || typeof tg.shareToStory !== "function") {
+          toast("Публикация Stories не поддерживается вашей версией Telegram");
+          return;
+        }
+        var r = lastResult;
+        if (!r) {
+          toast("Сначала посчитай калым");
+          return;
+        }
+        var mediaUrl = isPublicHttpsUrl(previewState.dataUrl)
+          ? previewState.dataUrl
+          : STORY_MEDIA_FALLBACK;
+        try {
+          tg.shareToStory(mediaUrl, {
+            text: "Мой калым: " + r.rams + " баранов 🐑",
+            widget_link: {
+              url: BOT_CONFIG.url,
+              name: "Калькулятор калыма"
             }
+          });
+          toast("Открываем редактор Stories… 📱");
+        } catch (e) {
+          toast("Не удалось открыть Stories");
+        }
+      }
+
+      function sendToBot() {
+        haptic("impact", "medium");
+        audio.click();
+        if (!lastResult) {
+          toast("Сначала посчитай калым");
+          return;
+        }
+        if (inTelegram && tg && typeof tg.sendData === "function") {
+          var payload = {
+            action: "send_certificate",
+            name: lastResult.name,
+            rams: lastResult.rams,
+            verdict: lastResult.verdict,
+            serial: lastResult.serial || (els.certSerial && els.certSerial.textContent) || "",
+            format: currentExportFormat()
+          };
+          try {
+            tg.sendData(JSON.stringify(payload));
+            toast("Данные отправлены боту! Открываю чат... 💬");
+          } catch (e) {
+            toast("Функция доступна только при запуске через кнопку бота в Telegram");
           }
-          fallback(fileBlob);
-        });
+        } else {
+          toast("Функция доступна только при запуске через кнопку бота в Telegram");
+        }
       }
 
       async function exportStories() {
@@ -2166,7 +2236,7 @@
         var canvas = await capture(els.storiesCard, { scale: 3, width: 360, height: 640, backgroundColor: "#09090b" });
         var url = canvas.toDataURL("image/png");
         var filename = "kalym-stories-" + slug(lastResult.name) + ".png";
-        openPreview(url, filename, dataUrlToBlob(url));
+        openPreview(url, filename, dataUrlToBlob(url), "stories");
         toast("Stories готовы 📱");
       }
 
@@ -2177,7 +2247,7 @@
         var canvas = await capture(els.certCard, { scale: 2, width: 1123, height: 794, backgroundColor: "#fff8e7" });
         var url = canvas.toDataURL("image/png");
         var filename = "kalym-cert-" + slug(lastResult.name) + ".png";
-        openPreview(url, filename, dataUrlToBlob(url));
+        openPreview(url, filename, dataUrlToBlob(url), "cert-png");
         toast("Сертификат готов 📜");
       }
 
@@ -2196,7 +2266,7 @@
         addPdfBotLink(pdf, w, h);
         var filename = "kalym-cert-" + slug(lastResult.name) + ".pdf";
         var blob = pdf.output("blob");
-        openPreview(img, filename, blob);
+        openPreview(img, filename, blob, "cert-pdf");
         toast("PDF готов 📄");
       }
 
@@ -2310,11 +2380,15 @@
       els.exportFormat.addEventListener("change", function () {
         haptic("impact", "light");
         audio.click();
+        syncPreviewActions();
       });
       els.exportBtn.addEventListener("click", runExport);
       els.shareBtn.addEventListener("click", shareResult);
+      if (els.sendToBotBtn) els.sendToBotBtn.addEventListener("click", sendToBot);
       els.againBtn.addEventListener("click", showForm);
+      if (els.storyShareBtn) els.storyShareBtn.addEventListener("click", shareToStory);
       if (els.savePreview) els.savePreview.addEventListener("click", savePreview);
+      if (els.sendToBotPreviewBtn) els.sendToBotPreviewBtn.addEventListener("click", sendToBot);
       els.closePreview.addEventListener("click", closePreview);
       els.previewModal.addEventListener("click", function (ev) {
         if (ev.target === els.previewModal) closePreview();

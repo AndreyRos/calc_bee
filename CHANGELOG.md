@@ -1,5 +1,10 @@
 # Журнал изменений (Changelog)
 
+## [1.9.0] - 2026-09-02
+
+### Export
+- [feat]: Добавлена нативная публикация в Telegram Stories и отправка сертификата в чат бота: `#storyShareBtn` вызывает `tg.shareToStory` (публичный HTTPS `mainpic.jpg` + caption с баранами и `widget_link` на Mini App), `#sendToBotBtn` / `#sendToBotPreviewBtn` шлют JSON `{ action: 'send_certificate', name, rams, verdict, serial, format }` через `tg.sendData`; `#savePreview` больше не пишет картинку в `navigator.clipboard` (ложный успех в Android WebView), сначала пробует `tg.downloadFile`, затем `navigator.share({ files })` при `canShare`, иначе открывает превью и просит зажать картинку для галереи. Файлы: index.html, README.md.
+
 ## [1.8.5] - 2026-09-02
 
 ### Export
