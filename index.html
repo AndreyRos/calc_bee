@@ -7,7 +7,7 @@
   <meta name="color-scheme" content="dark light" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
-  <meta name="app-version" content="1.8.3" />
+  <meta name="app-version" content="1.8.5" />
   <title>Калькулятор калыма 🐑</title>
   <meta name="description" content="Шуточный рейтинг выкупа в баранах" />
   <meta property="og:type" content="website" />
@@ -255,6 +255,14 @@
     #toast.show {
       transform: translateX(-50%) translateY(0);
       opacity: 1;
+    }
+    #previewImg {
+      -webkit-touch-callout: default;
+      touch-action: manipulation;
+    }
+    #previewImg.is-save-hint {
+      outline: 4px solid #a3e635;
+      outline-offset: 2px;
     }
     select {
       background-image: none;
@@ -1949,6 +1957,31 @@
         return String(name).toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9а-яё_-]/gi, "").slice(0, 32) || "kalym";
       }
 
+      function dataUrlToBlob(dataUrl) {
+        if (!dataUrl) return null;
+        try {
+          var comma = dataUrl.indexOf(",");
+          if (comma < 0) return null;
+          var header = dataUrl.slice(0, comma);
+          var mimeMatch = header.match(/data:([^;,]+)/);
+          var mime = (mimeMatch && mimeMatch[1]) || "image/png";
+          var body = dataUrl.slice(comma + 1);
+          var binary = /;base64/i.test(header) ? atob(body) : decodeURIComponent(body);
+          var bytes = new Uint8Array(binary.length);
+          for (var i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+          return new Blob([bytes], { type: mime });
+        } catch (e) {
+          return null;
+        }
+      }
+
+      function resolvePreviewBlob() {
+        if (previewState.blob) return previewState.blob;
+        var converted = dataUrlToBlob(previewState.dataUrl);
+        if (converted) previewState.blob = converted;
+        return converted;
+      }
+
       function capture(el, opts) {
         var prevPos = el.style.position;
         var prevLeft = el.style.left;
@@ -2009,40 +2042,120 @@
         audio.click();
         var filename = previewState.filename || "kalym.png";
         var dataUrl = previewState.dataUrl;
-        function fallback(fileBlob) {
-          if (fileBlob) downloadBlob(fileBlob, filename);
-          else if (dataUrl) downloadDataUrl(dataUrl, filename);
-          toast("Файл ушёл в загрузки");
-        }
-        function finish(fileBlob) {
-          if (fileBlob && typeof navigator.share === "function") {
-            try {
-              var file = new File([fileBlob], filename, { type: fileBlob.type || "image/png" });
-              var payload = { files: [file], title: filename };
-              var can = typeof navigator.canShare !== "function" || navigator.canShare(payload);
-              if (can) {
-                navigator.share(payload).then(function () {
-                  toast("Сохранено");
-                }).catch(function () {
-                  fallback(fileBlob);
-                });
-                return;
-              }
-            } catch (e) {}
-          }
-          fallback(fileBlob);
-        }
-        if (previewState.blob) {
-          finish(previewState.blob);
-          return;
-        }
-        if (!dataUrl) {
+        var fileBlob = resolvePreviewBlob();
+        if (!fileBlob && !dataUrl) {
           toast("Сначала экспортируй результат");
           return;
         }
-        fetch(dataUrl).then(function (res) { return res.blob(); }).then(finish).catch(function () {
-          downloadDataUrl(dataUrl, filename);
-          toast("Файл ушёл в загрузки");
+
+        function hintLongPress() {
+          if (els.previewImg) {
+            els.previewImg.classList.add("is-save-hint");
+            setTimeout(function () {
+              if (els.previewImg) els.previewImg.classList.remove("is-save-hint");
+            }, 2000);
+          }
+          toast("В Telegram зажми картинку — так она сохранится в галерею");
+        }
+
+        function tryCopyImage(blob) {
+          if (!blob || String(blob.type || "").indexOf("image/") !== 0) {
+            return Promise.reject(new Error("not-image"));
+          }
+          if (!navigator.clipboard || typeof ClipboardItem === "undefined") {
+            return Promise.reject(new Error("no-clipboard"));
+          }
+          var item = {};
+          item[blob.type] = blob;
+          return navigator.clipboard.write([new ClipboardItem(item)]);
+        }
+
+        function fallback(blob) {
+          if (!inTelegram) {
+            if (blob) downloadBlob(blob, filename);
+            else if (dataUrl) downloadDataUrl(dataUrl, filename);
+            toast("Файл ушёл в загрузки");
+            return;
+          }
+          var imageBlob = blob && String(blob.type || "").indexOf("image/") === 0
+            ? blob
+            : dataUrlToBlob(dataUrl);
+          tryCopyImage(imageBlob).then(function () {
+            toast("Картинка скопирована — вставь в чат или сохрани из буфера");
+          }).catch(function () {
+            hintLongPress();
+          });
+        }
+
+        function shareBlob(blob, name) {
+          if (!blob || typeof navigator.share !== "function") {
+            return Promise.reject(new Error("no-share"));
+          }
+          try {
+            var file = new File([blob], name, { type: blob.type || "image/png" });
+            var payload = { files: [file], title: name };
+            if (typeof navigator.canShare === "function" && !navigator.canShare(payload)) {
+              return Promise.reject(new Error("cannot-share"));
+            }
+            return navigator.share(payload);
+          } catch (e) {
+            return Promise.reject(e);
+          }
+        }
+
+        function shareOrTimeout(blob, name, ms) {
+          return new Promise(function (resolve, reject) {
+            var done = false;
+            var timer = setTimeout(function () {
+              if (done) return;
+              done = true;
+              reject(new Error("share-timeout"));
+            }, ms);
+            shareBlob(blob, name).then(function () {
+              if (done) return;
+              done = true;
+              clearTimeout(timer);
+              resolve();
+            }).catch(function (err) {
+              if (done) return;
+              done = true;
+              clearTimeout(timer);
+              reject(err);
+            });
+          });
+        }
+
+        toast("Сохраняем…");
+
+        if (!fileBlob) {
+          fallback(null);
+          return;
+        }
+
+        var platform = (tg && tg.platform) || "";
+        var skipShare = inTelegram && (platform === "ios" || platform === "macos");
+        if (skipShare) {
+          fallback(fileBlob);
+          return;
+        }
+
+        shareOrTimeout(fileBlob, filename, 1600).then(function () {
+          toast("Сохранено");
+        }).catch(function (err) {
+          if (err && err.name === "AbortError") return;
+          if (fileBlob.type === "application/pdf") {
+            var pngBlob = dataUrlToBlob(dataUrl);
+            var pngName = filename.replace(/\.pdf$/i, ".png");
+            if (pngBlob) {
+              return shareOrTimeout(pngBlob, pngName, 1600).then(function () {
+                toast("Сохранено");
+              }).catch(function (pngErr) {
+                if (pngErr && pngErr.name === "AbortError") return;
+                fallback(fileBlob);
+              });
+            }
+          }
+          fallback(fileBlob);
         });
       }
 
@@ -2053,7 +2166,7 @@
         var canvas = await capture(els.storiesCard, { scale: 3, width: 360, height: 640, backgroundColor: "#09090b" });
         var url = canvas.toDataURL("image/png");
         var filename = "kalym-stories-" + slug(lastResult.name) + ".png";
-        openPreview(url, filename);
+        openPreview(url, filename, dataUrlToBlob(url));
         toast("Stories готовы 📱");
       }
 
@@ -2064,7 +2177,7 @@
         var canvas = await capture(els.certCard, { scale: 2, width: 1123, height: 794, backgroundColor: "#fff8e7" });
         var url = canvas.toDataURL("image/png");
         var filename = "kalym-cert-" + slug(lastResult.name) + ".png";
-        openPreview(url, filename);
+        openPreview(url, filename, dataUrlToBlob(url));
         toast("Сертификат готов 📜");
       }
 
