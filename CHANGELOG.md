@@ -1,5 +1,10 @@
 # Журнал изменений (Changelog)
 
+## [1.9.2] - 2026-09-02
+
+### Export
+- [fix]: `capture` больше не ставит `allowTaint: true` (WebKit кидает SecurityError на `canvas.toDataURL`): теперь `useCORS: true`, `allowTaint: false`, `foreignObjectRendering: false`; у `#storiesCard` / `#certCard` первый шрифт системный (`system-ui`, `-apple-system`), чтобы html2canvas на iOS не тянул Google Fonts через SVG; `runExport` пишет `[export] name message` в консоль и при SecurityError показывает toast «Ошибка безопасности браузера. Переключаем на упрощенный рендер...». Файлы: index.html, README.md.
+
 ## [1.9.1] - 2026-09-02
 
 ### Export
