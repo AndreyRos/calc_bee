@@ -7,7 +7,7 @@
   <meta name="color-scheme" content="dark light" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
-  <meta name="app-version" content="1.9.0" />
+  <meta name="app-version" content="1.9.1" />
   <title>Калькулятор калыма 🐑</title>
   <meta name="description" content="Шуточный рейтинг выкупа в баранах" />
   <meta property="og:type" content="website" />
@@ -257,7 +257,10 @@
       opacity: 1;
     }
     #previewImg {
-      -webkit-touch-callout: default;
+      pointer-events: auto;
+      -webkit-touch-callout: default !important;
+      user-select: auto !important;
+      -webkit-user-select: auto !important;
       touch-action: manipulation;
     }
     #previewImg.is-save-hint {
@@ -2069,7 +2072,7 @@
         els.previewModal.classList.remove("flex");
       }
 
-      function savePreview() {
+      async function savePreview() {
         haptic("impact", "medium");
         audio.click();
         var filename = previewState.filename || "kalym.png";
@@ -2080,87 +2083,16 @@
           return;
         }
 
-        function hintLongPress() {
-          if (els.previewImg) {
-            els.previewImg.classList.add("is-save-hint");
-            els.previewImg.title = "Зажми картинку для сохранения в галерею";
-            setTimeout(function () {
-              if (els.previewImg) els.previewImg.classList.remove("is-save-hint");
-            }, 2200);
-          }
-          toast("Зажми картинку для сохранения в галерею");
-        }
-
-        function fallbackOpen() {
-          hintLongPress();
-          var url = dataUrl;
-          if (!url) return;
-          if (isPublicHttpsUrl(url)) {
-            if (tg && typeof tg.openLink === "function") {
-              try { tg.openLink(url); return; } catch (e) {}
-            }
-            window.open(url, "_blank");
-            return;
-          }
-          try {
-            var win = window.open(url, "_blank");
-            if (!win && inTelegram) return;
-          } catch (e) {}
-        }
-
-        function tryNativeDownload() {
-          if (!inTelegram || !tg || typeof tg.downloadFile !== "function") return false;
-          try {
-            tg.downloadFile({ url: dataUrl, file_name: filename }, function (accepted) {
-              if (accepted) toast("Файл сохраняется через Telegram... 📥");
-              else fallbackOpen();
-            });
-            return true;
-          } catch (e) {
-            return false;
-          }
-        }
-
-        function canShareFile(blob, name) {
-          if (!blob || typeof navigator.share !== "function") return null;
-          try {
-            var file = new File([blob], name, { type: blob.type || "image/png" });
-            var payload = { files: [file], title: name };
-            if (typeof navigator.canShare === "function" && !navigator.canShare(payload)) {
-              return null;
-            }
-            return payload;
-          } catch (e) {
-            return null;
-          }
-        }
-
-        if (tryNativeDownload()) return;
-
         var platform = (tg && tg.platform) || "";
-        var skipShare = inTelegram && (platform === "ios" || platform === "macos");
-        var sharePayload = !skipShare ? canShareFile(fileBlob, filename) : null;
-        if (!sharePayload && !skipShare && fileBlob && fileBlob.type === "application/pdf") {
-          var pngBlob = dataUrlToBlob(dataUrl);
-          var pngName = filename.replace(/\.pdf$/i, ".png");
-          sharePayload = canShareFile(pngBlob, pngName);
-        }
+        var isIOS = platform === "ios" || platform === "macos";
+        var isAndroid = platform === "android";
 
-        if (sharePayload) {
-          toast("Сохраняем…");
-          navigator.share(sharePayload).then(function () {
-            toast("Сохранено");
-          }).catch(function (err) {
-            if (err && err.name === "AbortError") return;
-            if (!inTelegram) {
-              if (fileBlob) downloadBlob(fileBlob, filename);
-              else if (dataUrl) downloadDataUrl(dataUrl, filename);
-              toast("Файл ушёл в загрузки");
-              return;
-            }
-            fallbackOpen();
-          });
-          return;
+        function highlightPreview() {
+          if (!els.previewImg) return;
+          els.previewImg.classList.add("is-save-hint");
+          setTimeout(function () {
+            if (els.previewImg) els.previewImg.classList.remove("is-save-hint");
+          }, 2200);
         }
 
         if (!inTelegram) {
@@ -2170,7 +2102,38 @@
           return;
         }
 
-        fallbackOpen();
+        if (isIOS) {
+          highlightPreview();
+          toast("Зажмите картинку и выберите «Сохранить в Фото» 📲");
+          return;
+        }
+
+        if (isAndroid) {
+          var blob = resolvePreviewBlob();
+          if (typeof navigator.canShare === "function" && blob) {
+            try {
+              var file = new File([blob], filename, { type: blob.type || "image/png" });
+              if (navigator.canShare({ files: [file] })) {
+                try {
+                  await navigator.share({
+                    files: [file],
+                    title: "Калькулятор калыма 🐑"
+                  });
+                  toast("Успешно сохранено! ✅");
+                  return;
+                } catch (err) {
+                  if (err && err.name === "AbortError") return;
+                }
+              }
+            } catch (e) {}
+          }
+          highlightPreview();
+          toast("Зажмите картинку и выберите «Сохранить изображение» 📥");
+          return;
+        }
+
+        highlightPreview();
+        toast("Зажмите картинку и выберите «Сохранить изображение» 📥");
       }
 
       function shareToStory() {

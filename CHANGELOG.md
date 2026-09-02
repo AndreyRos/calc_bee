@@ -1,5 +1,10 @@
 # Журнал изменений (Changelog)
 
+## [1.9.1] - 2026-09-02
+
+### Export
+- [fix]: `#savePreview` больше не зовёт `tg.downloadFile` с `data:` (на Android открывалось мёртвое меню) и не шарит файл на iOS (WKWebView зависает): iOS/macOS только подсветка `#previewImg` и toast «Зажмите картинку и выберите «Сохранить в Фото»»; Android в Telegram идёт через `navigator.share({ files })` при `canShare`, иначе toast «Сохранить изображение»; вне Telegram — `downloadBlob`. На `#previewImg` включены `pointer-events`, `-webkit-touch-callout` и `user-select`, чтобы long-press открывал системное меню. Файлы: index.html, README.md.
+
 ## [1.9.0] - 2026-09-02
 
 ### Export
